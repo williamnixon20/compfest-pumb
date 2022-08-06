@@ -2,8 +2,9 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
-  console.log('Controller started at port ', process.env.PORT || 3000);
-  await app.listen(3000);
+  const app = await NestFactory.create(AppModule, { cors: true });
+  const port = process.env.PORT || 80;
+  console.log('Controller started at port ', port);
+  await app.listen(port);
 }
 bootstrap();
