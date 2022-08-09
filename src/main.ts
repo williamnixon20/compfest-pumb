@@ -11,6 +11,8 @@ async function bootstrap() {
     .setDescription('')
     .setVersion('1.0')
     .build();
+  const prismaService = app.get(PrismaService);
+  await prismaService.enableShutdownHooks(app);
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('', app, document);
   await app.listen(port);
