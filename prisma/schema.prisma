@@ -15,6 +15,8 @@ model User {
   first_name  String
   last_name   String
   email       String
+  created_at  DateTime         @default(now())
+  updated_at  DateTime         @updatedAt
   role        UserRole
   status      UserStatus?
   teachers    TeachersOnCourses[]
@@ -214,8 +216,8 @@ enum Status {
 //   candidate_id     String
 //   payload          String
 //   progress         Progress         @default(BELUM_DISETUJUI_ADMIN_DAN_KANDIDAT)
-//   created_at       DateTime         @default(now())
-//   updated_at       DateTime         @updatedAt
+// /created_at       DateTime         @default(now())
+// /updated_at       DateTime         @updatedAt
 //   challenge_answer ChallengeAnswer?
 // }
 
