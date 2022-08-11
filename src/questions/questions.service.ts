@@ -7,8 +7,6 @@ import { Question } from './entities/question.entity';
 
 @Injectable()
 export class QuestionsService {
-  constructor(private prisma: PrismaService) {}
-
   create(createQuestionDto: CreateQuestionDto) {
     const statement = createQuestionDto.statement;
     const feedback = createQuestionDto.feedback;

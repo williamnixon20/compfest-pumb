@@ -1,13 +1,10 @@
 import { Injectable } from '@nestjs/common';
-import { PrismaService } from '../prisma/prisma.service';
 import { CreateAnswerDto } from './dto/create-answer.dto';
 import { UpdateAnswerDto } from './dto/update-answer.dto';
 import { Answer } from './entities/answer.entity';
 
 @Injectable()
 export class AnswersService {
-  constructor(private prisma: PrismaService) {}
-
   create(createAnswerDto: CreateAnswerDto) {
     const answer = new Answer(0, createAnswerDto.content);
     return answer;

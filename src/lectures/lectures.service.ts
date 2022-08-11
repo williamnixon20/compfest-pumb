@@ -1,13 +1,10 @@
 import { Injectable } from '@nestjs/common';
-import { PrismaService } from '../prisma/prisma.service';
 import { CreateLectureDto } from './dto/create-lecture.dto';
 import { UpdateLectureDto } from './dto/update-lecture.dto';
 import { Lecture } from './entities/lecture.entity';
 
 @Injectable()
 export class LecturesService {
-  constructor(private prisma: PrismaService) {}
-
   create(createLectureDto: CreateLectureDto) {
     const lecture = new Lecture(0, createLectureDto.name, createLectureDto.description, createLectureDto.resource_url);
     return lecture;
