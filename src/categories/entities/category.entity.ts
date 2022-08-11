@@ -1,5 +1,4 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { Course } from "src/courses/entities/course.entity";
 
 export class Category {
     @ApiProperty()
