@@ -1,6 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -11,138 +8,133 @@ datasource db {
 }
 
 model User {
-  id          Int @default(autoincrement()) @id
+  id          Int                 @id @default(autoincrement())
+  email       String   @unique
+  username    String   @unique
   first_name  String
   last_name   String
-  email       String
+  password    String
   created_at  DateTime         @default(now())
   updated_at  DateTime         @updatedAt
   role        UserRole
-  status      UserStatus?
-  teachers    TeachersOnCourses[]
   subscribers StudentsOnCourses[]
+  teachers    TeachersOnCourses[]
   quizzes     UserOnQuiz[]
+  status      UserStatus?
 }
 
 model UserStatus {
-  id          Int     @default(autoincrement()) @id
-  user        User    @relation(fields: [user_id], references: [id])
-  user_id     Int     @unique 
-  status      Status  @default(VERIFYING)
-  description String  @default("Please be patient, we are verifying your account!")
+  id          Int    @id @default(autoincrement())
+  user_id     Int    @unique
+  verification_status        Status
+  description String
+  user        User   @relation(fields: [user_id], references: [id])
 }
 
 model Quiz {
-  id          Int @default(autoincrement()) @id
-  title       String
-  questions   Question[]
-  attempts    UserOnQuiz[]
-  course      Course @relation(fields: [course_id], references: [id])
-  course_id   Int
+  id        Int          @id @default(autoincrement())
+  title     String
+  course_id Int
+  course    Course       @relation(fields: [course_id], references: [id])
+  questions Question[]
+  attempts  UserOnQuiz[]
 }
 
 model Question {
-  id                Int @default(autoincrement()) @id
+  id                Int              @id @default(autoincrement())
   statement         String
   feedback          String
-  quiz              Quiz @relation(fields: [quiz_id], references: [id])
-  quiz_id           Int 
-  answer            Option @relation(fields: [answer_id], references: [id])
-  answer_id         Int
+  quiz_id           Int
+  quiz              Quiz             @relation(fields: [quiz_id], references: [id])
+  MultipleChoice    MultipleChoice?
   question_attempts QuestionAnswer[]
-  options           OptionOnQuestion[]
 }
 
-// Question yang dijawab user
 model QuestionAnswer {
-  id            Int @default(autoincrement()) @id
-  user_quiz     UserOnQuiz @relation(fields: [user_quiz_id], references: [id])
-  user_quiz_id  Int
-  question      Question @relation(fields: [question_id], references: [id])
-  question_id   Int
-  answer        Int
-}
-
-model Option {
-  id            Int @default(autoincrement()) @id
-  statement     String @unique
-  questions     OptionOnQuestion[]
-  answer_to     Question[]
-}
-
-model OptionOnQuestion {
-  option        Option @relation(fields: [option_id], references: [id])
-  option_id     Int
-  question      Question @relation(fields: [question_id], references: [id])
-  question_id   Int
-  
-  @@id([question_id, option_id])  
+  id           Int        @id @default(autoincrement())
+  user_quiz_id Int
+  question_id  Int
+  answer       Int
+  question     Question   @relation(fields: [question_id], references: [id])
+  user_quiz    UserOnQuiz @relation(fields: [user_quiz_id], references: [id])
 }
 
 model Course {
-  id              Int @default(autoincrement()) @id
-  description     String
-  course_status   CourseStatus?
-  categories      Category[]
-  lectures        Lecture[]
-  quizzes         Quiz[]
-  followers       StudentsOnCourses[]
-  teacher         TeachersOnCourses[]
+  id            Int                 @id @default(autoincrement())
+  description   String
+  course_status CourseStatus?
+  lectures      Lecture[]
+  quizzes       Quiz[]
+  followers     StudentsOnCourses[]
+  teacher       TeachersOnCourses[]
+  categories    Category[]
 }
 
 model CourseStatus {
-  id              Int @default(autoincrement()) @id
-  status          Status @default(VERIFYING)
-  description     String @default("Please be patient, we are verifying your course request!")
-  course          Course @relation(fields: [course_id], references: [id])
-  course_id       Int @unique
+  id          Int    @id @default(autoincrement())
+  course_id   Int    @unique
+  status      Status
+  description String
+  course      Course @relation(fields: [course_id], references: [id])
 }
 
 model Category {
-  id        Int @default(autoincrement()) @id
-  name      String @unique
-  courses   Course[]
+  id      Int      @id @default(autoincrement())
+  name    String   @unique
+  courses Course[]
 }
 
 model Lecture {
-  id              Int @default(autoincrement()) @id
-  description     String
-  resource_url    String
-  course          Course @relation(fields: [course_id], references: [id])
-  course_id       Int
+  id           Int    @id @default(autoincrement())
+  description  String
+  resource_url String
+  course_id    Int
+  course       Course @relation(fields: [course_id], references: [id])
 }
 
 model StudentsOnCourses {
-  user            User @relation(fields: [user_id], references: [id])
-  user_id         Int
-  course          Course @relation(fields: [course_id], references: [id])
-  course_id       Int
-  created_at      DateTime @default(now())
-  updated_at      DateTime         @updatedAt
-  progress        Int
-  
+  user_id    Int
+  course_id  Int
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+  progress   Int
+  course     Course   @relation(fields: [course_id], references: [id])
+  user       User     @relation(fields: [user_id], references: [id])
+
   @@id([course_id, user_id])
 }
 
 model TeachersOnCourses {
-  user          User @relation(fields: [user_id], references: [id])
-  user_id       Int
-  course        Course @relation(fields: [course_id], references: [id])
-  course_id     Int
-  created_at    DateTime @default(now())
-  updated_at    DateTime         @updatedAt
-  
+  user_id    Int
+  course_id  Int
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+  course     Course   @relation(fields: [course_id], references: [id])
+  user       User     @relation(fields: [user_id], references: [id])
+
   @@id([course_id, user_id])
 }
 
 model UserOnQuiz {
-  id          Int @default(autoincrement()) @id
-  user        User @relation(fields: [user_id], references: [id])
-  user_id     Int
-  quiz        Quiz @relation(fields: [quiz_id], references: [id])
-  quiz_id     Int
-  score       Int
+  id               Int              @id @default(autoincrement())
+  user_id          Int
+  quiz_id          Int
+  score            Int
+  quiz             Quiz             @relation(fields: [quiz_id], references: [id])
+  user             User             @relation(fields: [user_id], references: [id])
   received_answers QuestionAnswer[]
+}
+
+model MultipleChoice {
+  id          Int      @id @default(autoincrement())
+  option_1    String
+  option_2    String
+  option_3    String
+  Option_4    String
+  feedback    String
+  answer      String
+  question_id Int      @unique
+  Question    Question @relation(fields: [question_id], references: [id])
 }
 
 enum UserRole {
@@ -152,136 +144,7 @@ enum UserRole {
 }
 
 enum Status {
+  ASSESSING
   VERIFYING
   REJECTED
 }
-
-// enum Role {
-//   USER
-//   CANDIDATE
-//   ADMIN
-// }
-
-// model User {
-//   id            String     @id @default(uuid())
-//   nim           String     @unique
-//   email_itb     String     @unique
-//   email_non_itb String
-//   long_name     String
-//   short_name    String
-//   fakultas      String
-//   role          Role       @default(USER)
-//   candidate     Candidate?
-//   Vote          Vote[]
-// }
-
-// enum CandidateType {
-//   K3M
-//   MWAWM
-// }
-
-// model Candidate {
-//   id         String        @id @default(uuid())
-//   account    User          @relation(fields: [account_id], references: [id])
-//   account_id String        @unique
-//   point      Int           @default(0)
-//   password   String
-//   nomor_urut Int
-//   type       CandidateType
-//   Challenge   Challenge[]
-//   Pelanggaran Pelanggaran[]
-//   Vote        Vote[]
-// }
-
-// model Admin {
-//   id       String @id @default(uuid())
-//   password String
-//   username String
-// }
-
-// enum Progress {
-//   BELUM_DISETUJUI_ADMIN_DAN_KANDIDAT
-//   BELUM_DISETUJUI_ADMIN
-//   BELUM_DISETUJUI_KANDIDAT
-//   DISETUJUI
-//   REJECTED
-// }
-
-// model Challenge {
-//   id               String           @id @default(uuid())
-//   judul            String
-//   sender_name      String
-//   sender_ktm_url   String
-//   candidate        Candidate        @relation(fields: [candidate_id], references: [id])
-//   candidate_id     String
-//   payload          String
-//   progress         Progress         @default(BELUM_DISETUJUI_ADMIN_DAN_KANDIDAT)
-// /created_at       DateTime         @default(now())
-// /updated_at       DateTime         @updatedAt
-//   challenge_answer ChallengeAnswer?
-// }
-
-// enum ResponsePelanggaran {
-//   ON_REVIEW
-//   ACCEPTED
-//   REJECTED
-// }
-
-// model ChallengeAnswer {
-//   id           String    @id @default(uuid())
-//   challenge    Challenge @relation(fields: [challenge_id], references: [id])
-//   challenge_id String    @unique
-//   answer       String
-//   created_at   DateTime  @default(now())
-// }
-
-// model Pelanggaran {
-//   id             String              @id @default(uuid())
-//   judul          String
-//   sender_name    String
-//   sender_ktm_url String
-//   candidate      Candidate           @relation(fields: [candidate_id], references: [id])
-//   candidate_id   String
-//   keterangan     String
-//   bukti_url      String
-//   progress       ResponsePelanggaran @default(ON_REVIEW)
-//   created_at     DateTime            @default(now())
-// }
-
-// model Vote {
-//   id           String        @id @default(uuid())
-//   voter        User          @relation(fields: [voter_id], references: [id])
-//   voter_id     String
-//   candidate    Candidate     @relation(fields: [candidate_id], references: [id])
-//   candidate_id String
-//   rank         Int
-//   type         CandidateType
-//   created_at   DateTime      @default(now())
-//   @@unique([candidate_id, voter_id])
-//   @@unique([voter_id, rank, type])
-// }
-
-// model TopikDebat {
-//   id             String   @id @default(uuid())
-//   nama           String
-//   sender_name    String
-//   sender_ktm_url String
-//   lembaga        String?
-//   created_at     DateTime @default(now())
-// }
-
-// // model User {
-// //   id    Int     @default(autoincrement()) @id
-// //   email String  @unique
-// //   name  String?
-// //   posts Post[]
-// // }
-
-// // model Post {
-// //   id        Int      @default(autoincrement()) @id
-// //   title     String
-// //   content   String?
-// //   published Boolean? @default(false)
-// //   author    User?    @relation(fields: [authorId], references: [id])
-// //   authorId  Int?
-// // }

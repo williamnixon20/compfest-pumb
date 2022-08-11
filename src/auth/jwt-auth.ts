@@ -5,10 +5,8 @@ import { jwtConstants } from './constants';
 import { AuthGuard } from '@nestjs/passport';
 import { SetMetadata } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import { ApiTags } from '@nestjs/swagger';
 
-export const Public = () =>
-  applyDecorators(SetMetadata('isPublic', true), ApiTags('Public'));
+export const Public = () => applyDecorators(SetMetadata('isPublic', true));
 
 @Injectable()
 export class JwtAuthGuard extends AuthGuard('jwt') {
@@ -41,6 +39,11 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   }
 
   async validate(payload: any) {
-    return { userId: payload.sub, username: payload.username };
+    return {
+      sub: payload.sub,
+      email: payload.email,
+      role: payload.role,
+      status: payload?.status,
+    };
   }
 }
