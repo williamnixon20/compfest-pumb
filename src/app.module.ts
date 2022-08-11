@@ -9,6 +9,7 @@ import { UsersModule } from './users/users.module';
 import { APP_GUARD } from '@nestjs/core';
 import { JwtAuthGuard } from './auth/jwt-auth';
 import { CoursesModule } from './courses/courses.module';
+import { QuizzesModule } from './quizzes/quizzes.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { CoursesModule } from './courses/courses.module';
     LecturesModule, 
     QuestionsModule,
     CoursesModule,
+    QuizzesModule,
   ],
   controllers: [],
   providers: [
