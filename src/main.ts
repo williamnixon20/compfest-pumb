@@ -6,7 +6,7 @@ import { PrismaService } from './prisma/prisma.service';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, { cors: true });
-  const port = process.env.PORT || 3015;
+  const port = process.env.PORT || 3000;
   console.log('Controller started at port', port);
 
   const config = new DocumentBuilder()
