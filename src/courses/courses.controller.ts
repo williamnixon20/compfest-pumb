@@ -11,7 +11,7 @@ import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { CoursesService } from './courses.service';
 import { CreateCourseDto } from './dto/create-course.dto';
 import { UpdateCourseDto } from './dto/update-course.dto';
-import { Public } from 'src/auth/jwt-auth';
+import { Public } from '../auth/jwt-auth';
 @ApiTags('Courses')
 @Controller('courses')
 export class CoursesController {
