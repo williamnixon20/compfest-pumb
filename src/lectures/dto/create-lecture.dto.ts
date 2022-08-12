@@ -1,12 +1,18 @@
 import { ApiProperty } from "@nestjs/swagger";
+import {
+    IsNotEmpty,
+    IsNumber,
+    IsString
+} from "class-validator";
 
 export class CreateLectureDto {
+    @IsNotEmpty()
+    @IsString()
     @ApiProperty()
-    name: string;
-    
-    @ApiProperty()
-    description: string;
+    title: string;
 
+    @IsNotEmpty()
+    @IsNumber()
     @ApiProperty()
-    resource_url: string;
+    course_id: number;
 }
