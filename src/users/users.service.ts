@@ -24,7 +24,7 @@ export class UsersService {
     if (data.role === UserRole.TEACHER) {
       status = {
         create: {
-          verification_status: Status.VERIFYING,
+          status: Status.VERIFYING,
           description: 'Hold on tight! We are verifying your account.',
         },
       };

@@ -1,5 +1,18 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
-import { ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+} from '@nestjs/common';
+import {
+  ApiBearerAuth,
+  ApiCreatedResponse,
+  ApiOkResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { AnswersService } from './answers.service';
 import { CreateAnswerDto } from './dto/create-answer.dto';
 import { UpdateAnswerDto } from './dto/update-answer.dto';
@@ -15,13 +28,14 @@ export class AnswersController {
   create(@Body() createAnswerDto: CreateAnswerDto) {
     return this.answersService.create(createAnswerDto);
   }
-
+  @ApiBearerAuth()
   @Get()
   @ApiOkResponse({ type: Answer, isArray: true })
   findAll() {
     return this.answersService.findAll();
   }
 
+  @ApiBearerAuth()
   @Get(':id')
   @ApiOkResponse({ type: Answer })
   findOne(@Param('id') id: string) {
