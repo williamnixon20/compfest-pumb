@@ -1,57 +1,39 @@
 import { Injectable } from '@nestjs/common';
+import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateLectureDto } from './dto/create-lecture.dto';
 import { UpdateLectureDto } from './dto/update-lecture.dto';
 import { Lecture } from './entities/lecture.entity';
 
 @Injectable()
 export class LecturesService {
+  constructor(private readonly prisma: PrismaService) {}
+
   create(createLectureDto: CreateLectureDto) {
-    const lecture = new Lecture(
-      0,
-      createLectureDto.name,
-      createLectureDto.description,
-      createLectureDto.resource_url,
-    );
-    return lecture;
+    return this.prisma.lecture.create({
+      data: createLectureDto,
+    });
   }
 
   findAll() {
-    const lecture = new Lecture(
-      0,
-      'Google',
-      "Search the world's information, including webpages, images, videos and more.",
-      'www.google.com',
-    );
-    return [lecture];
+    return this.prisma.lecture.findMany();
   }
 
   findOne(id: number) {
-    const lecture = new Lecture(
-      id,
-      'Google',
-      "Search the world's information, including webpages, images, videos and more.",
-      'www.google.com',
-    );
-    return lecture;
+    return this.prisma.lecture.findUnique({
+      where: { id },
+    });
   }
 
   update(id: number, updateLectureDto: UpdateLectureDto) {
-    const lecture = new Lecture(
-      id,
-      updateLectureDto.name,
-      updateLectureDto.description,
-      updateLectureDto.resource_url,
-    );
-    return lecture;
+    return this.prisma.lecture.update({
+      where: { id },
+      data: updateLectureDto,
+    });
   }
 
   remove(id: number) {
-    const lecture = new Lecture(
-      id,
-      'Google',
-      "Search the world's information, including webpages, images, videos and more.",
-      'www.google.com',
-    );
-    return lecture;
+    return this.prisma.lecture.delete({
+      where: { id },
+    });
   }
 }

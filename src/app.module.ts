@@ -11,6 +11,7 @@ import { JwtAuthGuard } from './auth/jwt-auth';
 import { CoursesModule } from './courses/courses.module';
 import { QuizzesModule } from './quizzes/quizzes.module';
 import { AdminModule } from './admin/admin.module';
+import { ResourcesModule } from './resources/resources.module';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { AdminModule } from './admin/admin.module';
     CoursesModule,
     QuizzesModule,
     AdminModule,
+    ResourcesModule,
   ],
   controllers: [],
   providers: [

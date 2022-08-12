@@ -1,8 +1,22 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  ParseIntPipe,
+} from '@nestjs/common';
 import { LecturesService } from './lectures.service';
 import { CreateLectureDto } from './dto/create-lecture.dto';
 import { UpdateLectureDto } from './dto/update-lecture.dto';
-import { ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiCreatedResponse,
+  ApiOkResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { Lecture } from './entities/lecture.entity';
 
 @Controller('lectures')
@@ -10,33 +24,47 @@ import { Lecture } from './entities/lecture.entity';
 export class LecturesController {
   constructor(private readonly lecturesService: LecturesService) {}
 
+  @ApiBearerAuth()
   @Post()
   @ApiCreatedResponse({ type: Lecture })
-  create(@Body() createLectureDto: CreateLectureDto) {
+  create(
+    @Body() createLectureDto: CreateLectureDto,
+  ) {
     return this.lecturesService.create(createLectureDto);
   }
 
+  @ApiBearerAuth()
   @Get()
   @ApiOkResponse({ type: Lecture, isArray: true })
   findAll() {
     return this.lecturesService.findAll();
   }
 
+  @ApiBearerAuth()
   @Get(':id')
   @ApiOkResponse({ type: Lecture })
-  findOne(@Param('id') id: string) {
-    return this.lecturesService.findOne(+id);
+  findOne(
+    @Param('id', ParseIntPipe) id: number,
+  ) {
+    return this.lecturesService.findOne(id);
   }
 
+  @ApiBearerAuth()
   @Patch(':id')
   @ApiOkResponse({ type: Lecture })
-  update(@Param('id') id: string, @Body() updateLectureDto: UpdateLectureDto) {
-    return this.lecturesService.update(+id, updateLectureDto);
+  update(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() updateLectureDto: UpdateLectureDto,
+  ) {
+    return this.lecturesService.update(id, updateLectureDto);
   }
 
+  @ApiBearerAuth()
   @Delete(':id')
   @ApiOkResponse({ type: Lecture })
-  remove(@Param('id') id: string) {
-    return this.lecturesService.remove(+id);
+  remove(
+    @Param('id', ParseIntPipe) id: number,
+  ) {
+    return this.lecturesService.remove(id);
   }
 }
