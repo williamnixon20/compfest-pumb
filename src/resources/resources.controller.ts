@@ -1,4 +1,13 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, ParseIntPipe } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  ParseIntPipe,
+} from '@nestjs/common';
 import { ResourcesService } from './resources.service';
 import { CreateResourceDto } from './dto/create-resource.dto';
 import { UpdateResourceDto } from './dto/update-resource.dto';
@@ -37,7 +46,7 @@ export class ResourcesController {
   findOne(
     @Param('id', ParseIntPipe) id: number,
   ) {
-    return this.resourcesService.findOne(+id);
+    return this.resourcesService.findOne(id);
   }
 
   @ApiBearerAuth()
@@ -47,7 +56,7 @@ export class ResourcesController {
     @Param('id', ParseIntPipe) id: number,
     @Body() updateResourceDto: UpdateResourceDto,
   ) {
-    return this.resourcesService.update(+id, updateResourceDto);
+    return this.resourcesService.update(id, updateResourceDto);
   }
 
   @ApiBearerAuth()
@@ -56,6 +65,6 @@ export class ResourcesController {
   remove(
     @Param('id', ParseIntPipe) id: number,
   ) {
-    return this.resourcesService.remove(+id);
+    return this.resourcesService.remove(id);
   }
 }
