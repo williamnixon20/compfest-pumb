@@ -15,9 +15,10 @@ export class AdminService {
       throw new UnauthorizedException(
         'You are not allowed to access this resource!',
       );
+
     return await this.prisma.courseStatus.findMany({
       where: {
-        OR: [{ status: Status.ASSESSING }],
+        OR: [{ status: Status.VERIFYING }],
       },
       include: {
         course: true,
@@ -31,7 +32,7 @@ export class AdminService {
       );
     return await this.prisma.userStatus.findMany({
       where: {
-        OR: [{ status: Status.ASSESSING }],
+        OR: [{ status: Status.VERIFYING }],
       },
       include: {
         user: {
