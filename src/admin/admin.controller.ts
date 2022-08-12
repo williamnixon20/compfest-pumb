@@ -10,6 +10,7 @@ import {
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { AdminService } from './admin.service';
+import { UpdateCourseStatusDto, UpdateTeacherStatusDto } from './dto/admin.dto';
 
 @Controller('admin')
 @ApiTags('admin')
@@ -29,7 +30,7 @@ export class AdminController {
   @Patch('/courses/:id')
   updateCourse(
     @Param('id') id: string,
-    @Body() updateCourseDto,
+    @Body() updateCourseDto: UpdateCourseStatusDto,
     @Request() req,
   ) {
     return this.adminService.updateCourse(+id, updateCourseDto, req.user);
@@ -39,7 +40,7 @@ export class AdminController {
   @Patch('/teachers/:id')
   updateTeacher(
     @Param('id') id: string,
-    @Body() updateTeacherDto,
+    @Body() updateTeacherDto: UpdateTeacherStatusDto,
     @Request() req,
   ) {
     return this.adminService.updateTeacher(+id, updateTeacherDto, req.user);

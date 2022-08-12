@@ -10,18 +10,20 @@ import { APP_GUARD } from '@nestjs/core';
 import { JwtAuthGuard } from './auth/jwt-auth';
 import { CoursesModule } from './courses/courses.module';
 import { QuizzesModule } from './quizzes/quizzes.module';
+import { AdminModule } from './admin/admin.module';
 
 @Module({
   imports: [
-    PrismaModule, 
-    AuthModule, 
-    UsersModule, 
-    AnswersModule, 
-    CategoriesModule, 
-    LecturesModule, 
+    PrismaModule,
+    AuthModule,
+    UsersModule,
+    AnswersModule,
+    CategoriesModule,
+    LecturesModule,
     QuestionsModule,
     CoursesModule,
     QuizzesModule,
+    AdminModule,
   ],
   controllers: [],
   providers: [

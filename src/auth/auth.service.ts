@@ -47,7 +47,7 @@ export class AuthService {
       const validate = await this.validateUser(loginUserData);
       if (!validate) throw new UnauthorizedException('Failed to login!');
       const payload = {
-        user_id: validate.id,
+        id: validate.id,
         email: validate.email,
         role: validate.role,
         status: validate?.status,
@@ -65,8 +65,8 @@ export class AuthService {
   }
 
   async signup(createUserDto: CreateUserDto) {
-    if (createUserDto.role === UserRole.ADMIN)
-      throw new UnauthorizedException('Cant create admin!');
+    // if (createUserDto.role === UserRole.ADMIN)
+    //   throw new UnauthorizedException('Cant create admin!');
     try {
       const { password, ...result } = await this.usersService.createUser(
         createUserDto,
