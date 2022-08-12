@@ -11,12 +11,12 @@ export class AnswersService {
   }
 
   findAll() {
-    const answer = new Answer(0, "Carnivora");
+    const answer = new Answer(0, 'Carnivora');
     return [answer];
   }
 
   findOne(id: number) {
-    const answer = new Answer(id, "Herbivora");
+    const answer = new Answer(id, 'Herbivora');
     return answer;
   }
 
@@ -26,7 +26,7 @@ export class AnswersService {
   }
 
   remove(id: number) {
-    const answer = new Answer(id, "Omnivora");
+    const answer = new Answer(id, 'Omnivora');
     return answer;
   }
 }

@@ -25,43 +25,61 @@ export class AuthService {
     role: UserRole;
     status?: string;
   }> {
-    const user = await this.usersService.findUser({
-      email: loginUserData.email,
-    });
-    const isPasswordMatch = await bcrypt.compare(
-      loginUserData.password,
-      user.password,
-    );
-    if (user && isPasswordMatch) {
-      const { password, ...result } = user;
-      return result;
+    try {
+      const user = await this.usersService.findUser({
+        email: loginUserData.email,
+      });
+      const isPasswordMatch = await bcrypt.compare(
+        loginUserData.password,
+        user.password,
+      );
+      if (user && isPasswordMatch) {
+        const { password, ...result } = user;
+        return result;
+      }
+    } catch (err) {
+      throw new Error(err);
     }
-    throw new UnauthorizedException('Failed to login!');
   }
 
   async login(loginUserData: LoginUserDto) {
-    const validate = await this.validateUser(loginUserData);
-    if (!validate) throw new UnauthorizedException('Failed to login!');
-    const payload = {
-      user_id: validate.id,
-      email: validate.email,
-      role: validate.role,
-      status: validate?.status,
-    };
-    return {
-      message: 'Success!',
-      data: { access_token: this.jwtService.sign(payload) },
-    };
+    try {
+      const validate = await this.validateUser(loginUserData);
+      if (!validate) throw new UnauthorizedException('Failed to login!');
+      const payload = {
+        id: validate.id,
+        email: validate.email,
+        role: validate.role,
+        status: validate?.status,
+      };
+      return {
+        message: 'Success!',
+        data: { access_token: this.jwtService.sign(payload) },
+      };
+    } catch (err) {
+      throw new BadRequestException(
+        'Failed to login. Are you sure your data is correct?',
+        err.message,
+      );
+    }
   }
 
   async signup(createUserDto: CreateUserDto) {
-    const { password, ...result } = await this.usersService.createUser(
-      createUserDto,
-    );
-    if (!result) throw new BadRequestException('Email or Username taken');
-    return {
-      message: 'Success!',
-      data: { ...result },
-    };
+    // if (createUserDto.role === UserRole.ADMIN)
+    //   throw new UnauthorizedException('Cant create admin!');
+    try {
+      const { password, ...result } = await this.usersService.createUser(
+        createUserDto,
+      );
+      return {
+        message: 'Success!',
+        data: { ...result },
+      };
+    } catch (err) {
+      throw new BadRequestException(
+        'Failed to signup! Email or username might be taken',
+        err.message,
+      );
+    }
   }
 }

@@ -9,13 +9,13 @@ datasource db {
 
 model User {
   id          Int                 @id @default(autoincrement())
-  email       String   @unique
-  username    String   @unique
+  email       String              @unique
+  username    String              @unique
   first_name  String
   last_name   String
   password    String
-  created_at  DateTime         @default(now())
-  updated_at  DateTime         @updatedAt
+  created_at  DateTime            @default(now())
+  updated_at  DateTime            @updatedAt
   role        UserRole
   subscribers StudentsOnCourses[]
   teachers    TeachersOnCourses[]
@@ -26,7 +26,7 @@ model User {
 model UserStatus {
   id          Int    @id @default(autoincrement())
   user_id     Int    @unique
-  verification_status        Status
+  status      Status
   description String
   user        User   @relation(fields: [user_id], references: [id])
 }
@@ -62,6 +62,8 @@ model QuestionAnswer {
 model Course {
   id            Int                 @id @default(autoincrement())
   description   String
+  thumbnail_url String
+  title         String
   course_status CourseStatus?
   lectures      Lecture[]
   quizzes       Quiz[]
@@ -152,8 +154,8 @@ enum UserRole {
 }
 
 enum Status {
-  ASSESSING
   VERIFYING
+  VERIFIED
   REJECTED
 }
 

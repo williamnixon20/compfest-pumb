@@ -8,9 +8,7 @@ import { Lecture } from './entities/lecture.entity';
 export class LecturesService {
   constructor(private readonly prisma: PrismaService) {}
 
-  create(
-    createLectureDto: CreateLectureDto,
-  ) {
+  create(createLectureDto: CreateLectureDto) {
     return this.prisma.lecture.create({
       data: createLectureDto,
     });
@@ -20,27 +18,20 @@ export class LecturesService {
     return this.prisma.lecture.findMany();
   }
 
-  findOne(
-    id: number,
-  ) {
+  findOne(id: number) {
     return this.prisma.lecture.findUnique({
       where: { id },
     });
   }
 
-  update(
-    id: number,
-    updateLectureDto: UpdateLectureDto,
-  ) {
+  update(id: number, updateLectureDto: UpdateLectureDto) {
     return this.prisma.lecture.update({
       where: { id },
       data: updateLectureDto,
     });
   }
 
-  remove(
-    id: number,
-  ) {
+  remove(id: number) {
     return this.prisma.lecture.delete({
       where: { id },
     });
