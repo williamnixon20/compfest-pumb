@@ -86,10 +86,18 @@ model Category {
 
 model Lecture {
   id           Int    @id @default(autoincrement())
-  description  String
-  resource_url String
+  title        String
+  resources    Resource[]
   course_id    Int
   course       Course @relation(fields: [course_id], references: [id])
+}
+
+model Resource {
+  id         Int @id @default(autoincrement())
+  type       ResourceType
+  url        String
+  lecture_id Int
+  lecture    Lecture @relation(fields: [lecture_id], references: [id])
 }
 
 model StudentsOnCourses {
@@ -147,4 +155,10 @@ enum Status {
   ASSESSING
   VERIFYING
   REJECTED
+}
+
+enum ResourceType {
+  IMAGE
+  VIDEO
+  DOCUMENT
 }
