@@ -28,7 +28,7 @@ export class CoursesService {
   }
 
   findLecturesByCourseId(id: number) {
-    const lecture = new Lecture(0, "", "", "");
+    const lecture = new Lecture();
     return [lecture];
   }
 
