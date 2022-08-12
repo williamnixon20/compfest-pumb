@@ -10,6 +10,7 @@ import { APP_GUARD } from '@nestjs/core';
 import { JwtAuthGuard } from './auth/jwt-auth';
 import { CoursesModule } from './courses/courses.module';
 import { QuizzesModule } from './quizzes/quizzes.module';
+import { ResourcesModule } from './resources/resources.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { QuizzesModule } from './quizzes/quizzes.module';
     QuestionsModule,
     CoursesModule,
     QuizzesModule,
+    ResourcesModule,
   ],
   controllers: [],
   providers: [
