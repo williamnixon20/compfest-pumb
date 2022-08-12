@@ -61,9 +61,9 @@ model QuestionAnswer {
 
 model Course {
   id            Int                 @id @default(autoincrement())
-  title         String
   description   String
   thumbnail_url String
+  title         String
   course_status CourseStatus?
   lectures      Lecture[]
   quizzes       Quiz[]
