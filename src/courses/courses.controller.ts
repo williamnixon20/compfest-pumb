@@ -38,7 +38,6 @@ export class CoursesController {
   @ApiBearerAuth()
   @ApiOkResponse({ type: Course, isArray: true })
   findAll(@Query() params: ParamsDto) {
-    console.log(params);
     return this.coursesService.findAll(params.courseName, params.categoryId);
   }
 
@@ -54,17 +53,19 @@ export class CoursesController {
   //   return this.coursesService.findOne(+id);
   // }
 
-  // @Get(':id/quizzes')
-  // @ApiOkResponse({ type: [Quiz] })
-  // findQuizzesByCourseId(@Param('id') id: string) {
-  //   return this.coursesService.findQuizzesByCourseId(+id);
-  // }
+  @Get(':id/quizzes')
+  @ApiOkResponse({ type: [Quiz] })
+  @ApiBearerAuth()
+  findQuizzesByCourseId(@Param('id') id: string) {
+    return this.coursesService.findQuizzesByCourseId(+id);
+  }
 
-  // @Get(':id/lectures')
-  // @ApiOkResponse({ type: [Lecture] })
-  // findLecturesByCourseId(@Param('id') id: string) {
-  //   return this.coursesService.findLecturesByCourseId(+id);
-  // }
+  @Get(':id/lectures')
+  @ApiOkResponse({ type: [Lecture] })
+  @ApiBearerAuth()
+  findLecturesByCourseId(@Param('id') id: string) {
+    return this.coursesService.findLecturesByCourseId(+id);
+  }
 
   // @Patch(':id')
   // @ApiOkResponse({ type: Course })
