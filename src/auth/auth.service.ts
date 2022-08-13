@@ -18,6 +18,7 @@ export class AuthService {
   private async validateUser(loginUserData: LoginUserDto): Promise<{
     id: number;
     email: string;
+    username: string;
     first_name: string;
     last_name: string;
     created_at: Date;
@@ -27,7 +28,7 @@ export class AuthService {
   }> {
     try {
       const user = await this.usersService.findUser({
-        email: loginUserData.email,
+        username: loginUserData.username,
       });
       const isPasswordMatch = await bcrypt.compare(
         loginUserData.password,
@@ -49,12 +50,13 @@ export class AuthService {
       const payload = {
         id: validate.id,
         email: validate.email,
+        username: validate.username,
         role: validate.role,
         status: validate?.status,
       };
       return {
         message: 'Success!',
-        data: { access_token: this.jwtService.sign(payload) },
+        access_token: this.jwtService.sign(payload),
       };
     } catch (err) {
       throw new BadRequestException(
