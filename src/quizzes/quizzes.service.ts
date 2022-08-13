@@ -26,6 +26,14 @@ export class QuizzesService {
   findQuestionsByQuizId(QuizId: number) {
     return this.prisma.question.findMany({
       where: { quiz_id: QuizId },
+      include: {
+        options: {
+          select: {
+            id: true,
+            content: true,
+          }
+        },
+      },
     });
   }
 

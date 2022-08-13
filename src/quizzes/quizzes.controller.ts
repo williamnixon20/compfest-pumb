@@ -18,7 +18,7 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { Quiz } from './entities/quiz.entity';
-import { Question } from 'src/questions/entities/question.entity';
+import { FullQuestion } from 'src/questions/entities/full-question.entity';
 
 @Controller('quizzes')
 @ApiTags('quizzes')
@@ -27,7 +27,7 @@ export class QuizzesController {
 
   @ApiBearerAuth()
   @Post()
-  @ApiCreatedResponse({ type: Quiz})
+  @ApiCreatedResponse({ type: Quiz })
   create(
     @Body() createQuizDto: CreateQuizDto,
   ) {
@@ -52,7 +52,7 @@ export class QuizzesController {
 
   @ApiBearerAuth()
   @Get(':id/questions')
-  @ApiOkResponse({ type: [Question] })
+  @ApiOkResponse({ type: [FullQuestion] })
   findQuestionsByQuizId(
     @Param('id', ParseIntPipe) id: number,
   ) {
