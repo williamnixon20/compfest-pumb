@@ -5,5 +5,8 @@ export class Quiz {
     id: number;
 
     @ApiProperty()
-    name: string;
+    title: string;
+
+    @ApiProperty()
+    course_id: number;
 }
