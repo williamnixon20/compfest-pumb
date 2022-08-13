@@ -20,7 +20,7 @@ export class CreateUserDto {
 
 export class LoginUserDto {
   @IsNotEmpty()
-  email: string;
+  username: string;
   @IsNotEmpty()
   password: string;
 }
