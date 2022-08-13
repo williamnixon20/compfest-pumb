@@ -22,7 +22,7 @@ export class AuthController {
   }
 
   @ApiBearerAuth()
-  @Get('/test')
+  @Get('/me')
   async test(@Request() req) {
     return req.user;
   }
