@@ -113,19 +113,33 @@ export class CoursesService {
   }
 
   // findOne(id: number) {
-  //   const course = new Course();
+  //   try {
+
+  //   } catch (err) {
+
+  //   }
   //   return course;
   // }
 
-  // findQuizzesByCourseId(id: number) {
-  //   const quiz = new Quiz();
-  //   return [quiz];
-  // }
+  findQuizzesByCourseId(id: number) {
+    return this.prisma.quiz.findMany({
+      where: {
+        course: {
+          id: id,
+        },
+      },
+    });
+  }
 
-  // findLecturesByCourseId(id: number) {
-  //   const lecture = new Lecture();
-  //   return [lecture];
-  // }
+  findLecturesByCourseId(id: number) {
+    return this.prisma.lecture.findMany({
+      where: {
+        course: {
+          id: id,
+        },
+      },
+    });
+  }
 
   async subscribe(id: number, user) {
     if (user.role !== UserRole.STUDENT)
