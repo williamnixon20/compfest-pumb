@@ -2,7 +2,6 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateLectureDto } from './dto/create-lecture.dto';
 import { UpdateLectureDto } from './dto/update-lecture.dto';
-import { Lecture } from './entities/lecture.entity';
 
 @Injectable()
 export class LecturesService {
@@ -21,6 +20,12 @@ export class LecturesService {
   findOne(id: number) {
     return this.prisma.lecture.findUnique({
       where: { id },
+    });
+  }
+
+  findResourcesByLectureId(lectureId: number) {
+    return this.prisma.resource.findMany({
+      where: { lecture_id: lectureId },
     });
   }
 

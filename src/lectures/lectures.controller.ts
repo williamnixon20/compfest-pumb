@@ -18,6 +18,7 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { Lecture } from './entities/lecture.entity';
+import { Resource } from 'src/resources/entities/resource.entity';
 
 @Controller('lectures')
 @ApiTags('lectures')
@@ -48,6 +49,16 @@ export class LecturesController {
   ) {
     return this.lecturesService.findOne(id);
   }
+
+  @ApiBearerAuth()
+  @Get(':id/resources')
+  @ApiOkResponse({ type: Resource, isArray: true })
+  findResourcesByLectureId(
+    @Param('id', ParseIntPipe) id: number,
+  ) {
+    return this.lecturesService.findResourcesByLectureId(id);
+  }
+
 
   @ApiBearerAuth()
   @Patch(':id')

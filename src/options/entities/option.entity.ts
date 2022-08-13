@@ -1,12 +1,12 @@
 import { ApiProperty } from "@nestjs/swagger";
 
-export class Quiz {
+export class Option{
     @ApiProperty()
     id: number;
 
     @ApiProperty()
-    title: string;
+    content: string;
 
     @ApiProperty()
-    course_id: number;
+    question_id: number;
 }
