@@ -7,18 +7,19 @@ import {
   Param,
   Delete,
   Request,
+  Query,
 } from '@nestjs/common';
 import {
   ApiBearerAuth,
   ApiCreatedResponse,
   ApiOkResponse,
+  ApiQuery,
   ApiTags,
 } from '@nestjs/swagger';
 import { Lecture } from 'src/lectures/entities/lecture.entity';
 import { Quiz } from 'src/quizzes/entities/quiz.entity';
 import { CoursesService } from './courses.service';
-import { CreateCourseDto } from './dto/create-course.dto';
-import { UpdateCourseDto } from './dto/update-course.dto';
+import { CreateCourseDto, ParamsDto } from './dto/course.dto';
 import { Course } from './entities/course.entity';
 
 @Controller('courses')
@@ -36,8 +37,9 @@ export class CoursesController {
   @Get()
   @ApiBearerAuth()
   @ApiOkResponse({ type: Course, isArray: true })
-  findAll() {
-    return this.coursesService.findAll();
+  findAll(@Query() params: ParamsDto) {
+    console.log(params);
+    return this.coursesService.findAll(params.courseName, params.categoryId);
   }
 
   @Post(':id/subscribe')

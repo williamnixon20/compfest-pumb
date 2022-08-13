@@ -7,8 +7,7 @@ import { Status, User, UserRole } from '@prisma/client';
 import { Lecture } from 'src/lectures/entities/lecture.entity';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { Quiz } from 'src/quizzes/entities/quiz.entity';
-import { CreateCourseDto } from './dto/create-course.dto';
-import { UpdateCourseDto } from './dto/update-course.dto';
+import { CreateCourseDto } from './dto/course.dto';
 import { Course } from './entities/course.entity';
 
 @Injectable()
@@ -62,9 +61,32 @@ export class CoursesService {
     }
   }
 
-  async findAll() {
+  async findAll(courseName, categId) {
+    let queryCourse = {};
+    let queryCateg = {};
+    if (courseName) {
+      queryCourse = {
+        title: {
+          contains: courseName,
+        },
+      };
+    }
+
+    if (categId) {
+      queryCateg = {
+        categories: {
+          some: {
+            id: +categId,
+          },
+        },
+      };
+    }
     try {
       return await this.prisma.course.findMany({
+        where: {
+          ...queryCourse,
+          ...queryCateg,
+        },
         include: {
           categories: true,
           teacher: {
@@ -90,20 +112,20 @@ export class CoursesService {
     }
   }
 
-  findOne(id: number) {
-    const course = new Course();
-    return course;
-  }
+  // findOne(id: number) {
+  //   const course = new Course();
+  //   return course;
+  // }
 
-  findQuizzesByCourseId(id: number) {
-    const quiz = new Quiz();
-    return [quiz];
-  }
+  // findQuizzesByCourseId(id: number) {
+  //   const quiz = new Quiz();
+  //   return [quiz];
+  // }
 
-  findLecturesByCourseId(id: number) {
-    const lecture = new Lecture();
-    return [lecture];
-  }
+  // findLecturesByCourseId(id: number) {
+  //   const lecture = new Lecture();
+  //   return [lecture];
+  // }
 
   async subscribe(id: number, user) {
     if (user.role !== UserRole.STUDENT)
@@ -123,13 +145,13 @@ export class CoursesService {
     }
   }
 
-  update(id: number, updateCourseDto: UpdateCourseDto) {
-    const course = new Course();
-    return course;
-  }
+  // update(id: number, updateCourseDto: UpdateCourseDto) {
+  //   const course = new Course();
+  //   return course;
+  // }
 
-  remove(id: number) {
-    const course = new Course();
-    return course;
-  }
+  // remove(id: number) {
+  //   const course = new Course();
+  //   return course;
+  // }
 }
