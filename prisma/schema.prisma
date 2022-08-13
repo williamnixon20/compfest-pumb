@@ -87,19 +87,19 @@ model Category {
 }
 
 model Lecture {
-  id           Int    @id @default(autoincrement())
-  title        String
-  resources    Resource[]
-  course_id    Int
-  course       Course @relation(fields: [course_id], references: [id])
+  id        Int        @id @default(autoincrement())
+  course_id Int
+  title     String
+  course    Course     @relation(fields: [course_id], references: [id])
+  resources Resource[]
 }
 
 model Resource {
-  id         Int @id @default(autoincrement())
+  id         Int          @id @default(autoincrement())
   type       ResourceType
   url        String
   lecture_id Int
-  lecture    Lecture @relation(fields: [lecture_id], references: [id])
+  lecture    Lecture      @relation(fields: [lecture_id], references: [id])
 }
 
 model StudentsOnCourses {

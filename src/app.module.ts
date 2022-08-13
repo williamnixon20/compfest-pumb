@@ -2,7 +2,6 @@ import { Module } from '@nestjs/common';
 import { PrismaModule } from './prisma/prisma.module';
 import { AnswersModule } from './answers/answers.module';
 import { LecturesModule } from './lectures/lectures.module';
-import { CategoriesModule } from './categories/categories.module';
 import { QuestionsModule } from './questions/questions.module';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
@@ -19,7 +18,6 @@ import { ResourcesModule } from './resources/resources.module';
     AuthModule,
     UsersModule,
     AnswersModule,
-    CategoriesModule,
     LecturesModule,
     QuestionsModule,
     CoursesModule,
