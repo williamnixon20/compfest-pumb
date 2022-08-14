@@ -19,8 +19,9 @@ import {
 } from '@nestjs/swagger';
 import { Question } from './entities/question.entity';
 import { FullQuestion } from './entities/full-question.entity';
-import { CreateAnswerDto } from './dto/create-answer.dto';
 import { Answer } from './entities/answer.entity';
+import { UpdateAnswerDto } from './dto/update-answer.dto';
+import { UpdateFeedbackDto } from './dto/update-feedback.dto';
 
 @Controller('questions')
 @ApiTags('questions')
@@ -34,16 +35,6 @@ export class QuestionsController {
     @Body() createQuestionDto: CreateQuestionDto,
   ) {
     return this.questionsService.create(createQuestionDto);
-  }
-
-  @ApiBearerAuth()
-  @Post(':id/answer')
-  @ApiCreatedResponse({ type: Answer })
-  createAnswerByQuestionId(
-    @Param('id', ParseIntPipe) id: number,
-    @Body() createAnswerDto: CreateAnswerDto,
-  ) {
-    return this.questionsService.createAnswerByQuestionId(id, createAnswerDto);
   }
 
   @ApiBearerAuth()
@@ -65,10 +56,10 @@ export class QuestionsController {
   @ApiBearerAuth()
   @Get(':id/answer')
   @ApiOkResponse({ type: Answer })
-  findAnswerByQuestionId(
+  findAnswer(
     @Param('id', ParseIntPipe) id: number,
   ) {
-    return this.questionsService.findAnswerByQuestionId(id);
+    return this.questionsService.findAnswer(id);
   }
 
   @ApiBearerAuth()
@@ -79,6 +70,26 @@ export class QuestionsController {
     @Body() updateQuestionDto: UpdateQuestionDto,
   ) {
     return this.questionsService.update(id, updateQuestionDto);
+  }
+
+  @ApiBearerAuth()
+  @Patch(':id/answer')
+  @ApiOkResponse()
+  updateCorrectAnswer(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() updateAnswerDto: UpdateAnswerDto,
+  ) {
+    return this.questionsService.updateAnswer(id, updateAnswerDto);
+  }
+
+  @ApiBearerAuth()
+  @Patch(':id/feedback')
+  @ApiOkResponse()
+  updateFeedback(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() updateFeedbackDto: UpdateFeedbackDto,
+  ) {
+    return this.questionsService.updateFeedback(id, updateFeedbackDto);
   }
 
   @ApiBearerAuth()
