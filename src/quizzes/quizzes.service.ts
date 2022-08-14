@@ -85,20 +85,6 @@ export class QuizzesService {
     return submission;
   }
 
-  findQuestionsByQuizId(QuizId: number) {
-    return this.prisma.question.findMany({
-      where: { quiz_id: QuizId },
-      include: {
-        options: {
-          select: {
-            id: true,
-            content: true,
-          }
-        },
-      },
-    });
-  }
-
   update(id: number, updateQuizDto: UpdateQuizDto) {
     return this.prisma.quiz.update({
       where: { id },

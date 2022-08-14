@@ -19,7 +19,6 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { Quiz } from './entities/quiz.entity';
-import { FullQuestion } from 'src/questions/entities/full-question.entity';
 import { CreateSubmissionDto } from './dto/create-submission.dto';
 import { Submission } from './entities/submission.entity';
 
@@ -71,15 +70,6 @@ export class QuizzesController {
     @Param('id', ParseIntPipe) id: number,
   ) {
     return this.quizzesService.findSubmission(id, req.user);
-  }
-
-  @ApiBearerAuth()
-  @Get(':id/questions')
-  @ApiOkResponse({ type: [FullQuestion] })
-  findQuestionsByQuizId(
-    @Param('id', ParseIntPipe) id: number,
-  ) {
-    return this.quizzesService.findQuestionsByQuizId(id);
   }
 
   @ApiBearerAuth()
