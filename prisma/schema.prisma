@@ -70,12 +70,13 @@ model Answer {
 }
 
 model OptionOnQuestion {
-  id           Int        @id @default(autoincrement())
-  question_id  Int
-  question     Question   @relation(fields: [question_id], references: [id])
-  option_id    Int
-  option       Option     @relation(fields: [option_id], references: [id])
-  user_quizzes UserOnQuiz[]
+  id                Int        @id @default(autoincrement())
+  question_id       Int
+  question          Question   @relation(fields: [question_id], references: [id])
+  option_id         Int
+  option            Option     @relation(fields: [option_id], references: [id])
+  user_quizzes_id   Int
+  user_quizzes      UserOnQuiz @relation(fields: [user_quizzes_id], references: [id])
 }
 
 model Course {
@@ -153,6 +154,8 @@ model UserOnQuiz {
   quiz             Quiz             @relation(fields: [quiz_id], references: [id])
   score            Int
   answers          OptionOnQuestion[]
+  
+  @@unique([user_id, quiz_id])
 }
 
 enum UserRole {
