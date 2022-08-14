@@ -50,7 +50,7 @@ export class QuestionsService {
     });
   }
 
-  async findAnswerByQuestionId(QuestionId: number) {
+  findAnswerByQuestionId(QuestionId: number) {
     return this.prisma.answer.findUnique({
       where: { question_id: QuestionId }
     });
