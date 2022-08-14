@@ -10,7 +10,7 @@ import {
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { AdminService } from './admin.service';
-import { UpdateCourseStatusDto, UpdateTeacherStatusDto } from './dto/admin.dto';
+import { UpdateStatusDto } from './dto/admin.dto';
 
 @Controller('admin')
 @ApiTags('admin')
@@ -27,22 +27,20 @@ export class AdminController {
     return this.adminService.findAllPendingCourse(req.user);
   }
   @ApiBearerAuth()
-  @Patch('/courses/:id')
-  updateCourse(
-    @Param('id') id: string,
-    @Body() updateCourseDto: UpdateCourseStatusDto,
-    @Request() req,
-  ) {
-    return this.adminService.updateCourse(+id, updateCourseDto, req.user);
+  @Patch('/courses')
+  updateCourse(@Body() updateCourseDto: UpdateStatusDto, @Request() req) {
+    return this.adminService.updateCourse(
+      updateCourseDto.updateArray,
+      req.user,
+    );
   }
 
   @ApiBearerAuth()
-  @Patch('/teachers/:id')
-  updateTeacher(
-    @Param('id') id: string,
-    @Body() updateTeacherDto: UpdateTeacherStatusDto,
-    @Request() req,
-  ) {
-    return this.adminService.updateTeacher(+id, updateTeacherDto, req.user);
+  @Patch('/teachers')
+  updateTeacher(@Body() updateTeacherDto: UpdateStatusDto, @Request() req) {
+    return this.adminService.updateTeacher(
+      updateTeacherDto.updateArray,
+      req.user,
+    );
   }
 }

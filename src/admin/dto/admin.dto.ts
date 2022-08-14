@@ -1,8 +1,12 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Status } from '@prisma/client';
-import { IsEnum, IsNotEmpty } from 'class-validator';
+import { IsEnum, IsNotEmpty, IsNumberString } from 'class-validator';
 
-export class UpdateCourseStatusDto {
+export class UpdateStatusObject {
+  @IsNotEmpty()
+  @IsNumberString()
+  id: number;
+
   @IsNotEmpty()
   @ApiProperty({ enum: ['VERIFYING', 'VERIFIED', 'REJECTED'] })
   @IsEnum(Status)
@@ -11,13 +15,8 @@ export class UpdateCourseStatusDto {
   @IsNotEmpty()
   description: string;
 }
-
-export class UpdateTeacherStatusDto {
+export class UpdateStatusDto {
   @IsNotEmpty()
-  @ApiProperty({ enum: ['VERIFYING', 'VERIFIED', 'REJECTED'] })
-  @IsEnum(Status)
-  status: Status;
-
-  @IsNotEmpty()
-  description: string;
+  @ApiProperty({ type: [UpdateStatusObject] })
+  updateArray: UpdateStatusObject[];
 }
