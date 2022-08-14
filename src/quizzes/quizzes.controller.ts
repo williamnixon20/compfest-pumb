@@ -7,6 +7,7 @@ import {
   Param,
   Delete,
   ParseIntPipe,
+  Request,
 } from '@nestjs/common';
 import { QuizzesService } from './quizzes.service';
 import { CreateQuizDto } from './dto/create-quiz.dto';
@@ -19,6 +20,8 @@ import {
 } from '@nestjs/swagger';
 import { Quiz } from './entities/quiz.entity';
 import { FullQuestion } from 'src/questions/entities/full-question.entity';
+import { CreateSubmissionDto } from './dto/create-submission.dto';
+import { Submission } from './entities/submission.entity';
 
 @Controller('quizzes')
 @ApiTags('quizzes')
@@ -35,6 +38,16 @@ export class QuizzesController {
   }
 
   @ApiBearerAuth()
+  @Post(':id/submission')
+  @ApiCreatedResponse({ type: Submission })
+  createQuizSubmission(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() createSubmissionDto: CreateSubmissionDto,
+  ) {
+    return this.quizzesService.createSubmission(id, createSubmissionDto);
+  }
+
+  @ApiBearerAuth()
   @Get()
   @ApiOkResponse({ type: Quiz, isArray: true })
   findAll() {
@@ -48,6 +61,16 @@ export class QuizzesController {
     @Param('id', ParseIntPipe) id: number,
   ) {
     return this.quizzesService.findOne(id);
+  }
+
+  @ApiBearerAuth()
+  @Get(':id/submission')
+  @ApiOkResponse({ type: Submission })
+  findQuizSubmission(
+    @Request() req,
+    @Param('id', ParseIntPipe) id: number,
+  ) {
+    return this.quizzesService.findSubmission(id, req.user);
   }
 
   @ApiBearerAuth()
