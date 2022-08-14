@@ -5,6 +5,9 @@ export class Resource {
     @ApiProperty()
     id: number;
 
+    @ApiProperty()
+    name: string;
+
     @ApiProperty({ enum: ResourceType })
     type: ResourceType;
     

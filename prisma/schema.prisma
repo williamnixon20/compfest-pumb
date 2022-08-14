@@ -115,6 +115,7 @@ model Lecture {
 
 model Resource {
   id         Int          @id @default(autoincrement())
+  name       String
   type       ResourceType
   url        String
   lecture_id Int
