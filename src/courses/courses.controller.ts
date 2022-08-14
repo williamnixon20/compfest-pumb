@@ -16,10 +16,11 @@ import {
   ApiQuery,
   ApiTags,
 } from '@nestjs/swagger';
+import { Public } from 'src/auth/jwt-auth';
 import { Lecture } from 'src/lectures/entities/lecture.entity';
 import { Quiz } from 'src/quizzes/entities/quiz.entity';
 import { CoursesService } from './courses.service';
-import { CreateCourseDto, ParamsDto } from './dto/course.dto';
+import { CreateCourseDto, idParamsDto, ParamsDto } from './dto/course.dto';
 import { Course } from './entities/course.entity';
 
 @Controller('courses')
@@ -37,34 +38,46 @@ export class CoursesController {
   @Get()
   @ApiBearerAuth()
   @ApiOkResponse({ type: Course, isArray: true })
-  findAll(@Query() params: ParamsDto) {
-    return this.coursesService.findAll(params.courseName, params.categoryId);
+  findAll(@Query() params: ParamsDto, @Request() req) {
+    return this.coursesService.findAll(
+      params.courseName,
+      params.categoryId,
+      req.user,
+    );
+  }
+
+  @Get('/me')
+  @ApiBearerAuth()
+  findCourseByUser(@Request() req) {
+    return this.coursesService.findCoursesByUser(req.user);
   }
 
   @Post(':id/subscribe')
   @ApiBearerAuth()
-  subscribe(@Request() req, @Param('id') id: string) {
-    return this.coursesService.subscribe(+id, req.user);
+  subscribe(@Request() req, @Param() params: idParamsDto) {
+    return this.coursesService.subscribe(+params.id, req.user);
   }
 
-  // @Get(':id')
-  // @ApiOkResponse({ type: Course })
-  // findOne(@Param('id') id: string) {
-  //   return this.coursesService.findOne(+id);
-  // }
+  @Get(':id')
+  @ApiOkResponse({ type: Course })
+  @ApiBearerAuth()
+  findOne(@Param() params: idParamsDto, @Request() req) {
+    return this.coursesService.findOne(+params.id, req.user);
+  }
 
   @Get(':id/quizzes')
   @ApiOkResponse({ type: [Quiz] })
   @ApiBearerAuth()
-  findQuizzesByCourseId(@Param('id') id: string) {
-    return this.coursesService.findQuizzesByCourseId(+id);
+  @Public()
+  findQuizzesByCourseId(@Param() params: idParamsDto, @Request() req) {
+    return this.coursesService.findQuizzesByCourseId(+params.id, req.user);
   }
 
   @Get(':id/lectures')
   @ApiOkResponse({ type: [Lecture] })
   @ApiBearerAuth()
-  findLecturesByCourseId(@Param('id') id: string) {
-    return this.coursesService.findLecturesByCourseId(+id);
+  findLecturesByCourseId(@Param() params: idParamsDto, @Request() req) {
+    return this.coursesService.findLecturesByCourseId(+params.id, req.user);
   }
 
   // @Patch(':id')

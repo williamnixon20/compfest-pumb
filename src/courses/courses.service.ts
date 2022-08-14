@@ -35,7 +35,7 @@ export class CoursesService {
           course_status: {
             create: {
               status: Status.VERIFYING,
-              description: 'Hold on tight! We are verifying your account.',
+              description: 'Hold on tight! We are verifying your course.',
             },
           },
         },
@@ -61,7 +61,7 @@ export class CoursesService {
     }
   }
 
-  async findAll(courseName, categId) {
+  async findAll(courseName, categId, user) {
     let queryCourse = {};
     let queryCateg = {};
     if (courseName) {
@@ -86,6 +86,45 @@ export class CoursesService {
         where: {
           ...queryCourse,
           ...queryCateg,
+          course_status: {
+            status: Status.VERIFIED,
+          },
+        },
+        include: {
+          categories: true,
+          teacher: {
+            include: {
+              user: {
+                select: {
+                  username: true,
+                  email: true,
+                },
+              },
+            },
+          },
+          course_status: true,
+          _count: {
+            select: {
+              followers: true,
+            },
+          },
+          followers: {
+            where: {
+              user_id: user.id,
+            },
+          },
+        },
+      });
+    } catch (err) {
+      throw new BadRequestException("Can't fetch course!", err.message);
+    }
+  }
+
+  async findOne(id: number, user) {
+    try {
+      return await this.prisma.course.findUnique({
+        where: {
+          id: id,
         },
         include: {
           categories: true,
@@ -112,16 +151,7 @@ export class CoursesService {
     }
   }
 
-  // findOne(id: number) {
-  //   try {
-
-  //   } catch (err) {
-
-  //   }
-  //   return course;
-  // }
-
-  findQuizzesByCourseId(id: number) {
+  findQuizzesByCourseId(id: number, user) {
     return this.prisma.quiz.findMany({
       where: {
         course: {
@@ -131,7 +161,7 @@ export class CoursesService {
     });
   }
 
-  findLecturesByCourseId(id: number) {
+  findLecturesByCourseId(id: number, user) {
     return this.prisma.lecture.findMany({
       where: {
         course: {
@@ -156,6 +186,52 @@ export class CoursesService {
       return course;
     } catch (error) {
       throw new BadRequestException('Failed to subscribe!', error.message);
+    }
+  }
+
+  async findCoursesByUser(user) {
+    if (user.role === UserRole.ADMIN)
+      throw new UnauthorizedException(
+        'You are not allowed to access this resource!',
+      );
+
+    let teacherQuery = {};
+    let studentQuery = {};
+
+    if (user.role === UserRole.TEACHER) {
+      teacherQuery = {
+        teachers: {
+          include: {
+            course: true,
+          },
+        },
+      };
+    }
+    if (user.role === UserRole.STUDENT) {
+      studentQuery = {
+        subscribers: {
+          include: {
+            course: true,
+          },
+        },
+      };
+    }
+    try {
+      return await this.prisma.user.findUnique({
+        where: {
+          id: +user.id,
+        },
+        select: {
+          id: true,
+          username: true,
+          email: true,
+          role: true,
+          ...teacherQuery,
+          ...studentQuery,
+        },
+      });
+    } catch (err) {
+      throw new BadRequestException("Can't fetch course!", err.message);
     }
   }
 
