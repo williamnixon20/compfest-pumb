@@ -1,16 +1,15 @@
 import { Injectable } from '@nestjs/common';
 import { User, UserRole } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { CreateAnswerDto } from './dto/create-answer.dto';
 import { CreateQuizDto } from './dto/create-quiz.dto';
 import { CreateSubmissionDto } from './dto/create-submission.dto';
-import { UpdateQuizDto } from './dto/update-quiz.dto';
-import { Answer } from './entities/answer.entity';
+import { UpdateQuizDto } from './dto/update-quiz.dto'
 import { FullQuiz } from './entities/full-quiz.entity';
 import { QuizAttempt } from './entities/quiz-attempt.entity';
 import { QuizQuestion } from './entities/quiz-question.entity';
 import { Quiz } from './entities/quiz.entity';
 import { Submission } from './entities/submission.entity';
+import { UserAnswer } from './entities/user-answer.entity';
 
 @Injectable()
 export class QuizzesService {
@@ -22,24 +21,23 @@ export class QuizzesService {
     });
   }
 
-  async createSubmission(quizId: number, createSubmissionDto: CreateSubmissionDto) {
-    const { user_id, answers } = createSubmissionDto;
-    const score: number = await this.calculateScore(answers);
+  async createSubmission(user: User, quizId: number, createSubmissionDto: CreateSubmissionDto[]) {
+    const score: number = await this.calculateScore(createSubmissionDto);
 
     return this.prisma.userOnQuiz.create({
       data: {
-        user_id,
+        user_id: user.id,
         quiz_id: quizId,
         score,
       },
     });
   }
 
-  async calculateScore(answers: CreateAnswerDto[]) {
-    const totalQuestion: number = answers.length;
+  async calculateScore(createSubmissionDto: CreateSubmissionDto[]) {
+    const totalQuestion: number = createSubmissionDto.length;
     let totalCorrectAnswer: number = 0;
 
-    for (let answer of answers) {
+    for (let answer of createSubmissionDto) {
       const { correct_id: correctOptionId } = await this.prisma.answer.findUnique({
         select: {
           correct_id: true,
@@ -111,11 +109,10 @@ export class QuizzesService {
   }
 
   async findSubmission(quizId: number, user: User) {
-    const userId: number = user.id;
     const submission = await this.prisma.userOnQuiz.findUnique({
       where: {
         user_id_quiz_id: {
-          user_id: userId,
+          user_id: user.id,
           quiz_id: quizId,
         }
       },
@@ -133,18 +130,18 @@ export class QuizzesService {
       },
     });
 
-    const correctAnswers: Answer[] = 
-      await this.findCorrectAnswerAndFeedback(submission.answers);
+    const userAnswers: UserAnswer[] = 
+      await this.checkAnswer(submission.answers);
     const submissionWithFeedback: Submission =
-      {...submission, answers: correctAnswers};
+      {...submission, answers: userAnswers};
 
     return submissionWithFeedback;
   }
 
-  async findCorrectAnswerAndFeedback(
+  async checkAnswer(
     userAnswers: {question_id: number, option_id: number}[]
   ) {
-    let correctAnswers: Answer[];
+    let checkedAnswers: UserAnswer[];
 
     for (let answer of userAnswers) {
       const { feedback, correct_id } = await this.prisma.answer.findUnique({
@@ -156,10 +153,10 @@ export class QuizzesService {
           correct_id: true,
         },
       });
-      correctAnswers.push({...answer, feedback, correct_id});
+      checkedAnswers.push({...answer, feedback, correct_id});
     }
 
-    return correctAnswers;
+    return checkedAnswers;
   }
 
   update(id: number, updateQuizDto: UpdateQuizDto) {

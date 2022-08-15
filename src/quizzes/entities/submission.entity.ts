@@ -1,5 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { Answer } from "./answer.entity";
+import { UserAnswer } from "./user-answer.entity";
 
 export class Submission {
     @ApiProperty()
@@ -14,6 +14,6 @@ export class Submission {
     @ApiProperty()
     score: number;
 
-    @ApiProperty({ type: [Answer] })
-    answers: Answer[];
+    @ApiProperty({ type: [UserAnswer] })
+    answers: UserAnswer[];
 }

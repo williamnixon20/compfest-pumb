@@ -18,6 +18,7 @@ import {
   ApiExtraModels,
   ApiOkResponse,
   ApiTags,
+  getSchemaPath,
   refs,
 } from '@nestjs/swagger';
 import { Quiz } from './entities/quiz.entity';
@@ -45,20 +46,25 @@ export class QuizzesController {
   @Post(':id/submission')
   @ApiCreatedResponse({ type: Submission })
   createQuizSubmission(
+    @Request() req,
     @Param('id', ParseIntPipe) id: number,
-    @Body() createSubmissionDto: CreateSubmissionDto,
+    @Body() createSubmissionDto: CreateSubmissionDto[],
   ) {
-    return this.quizzesService.createSubmission(id, createSubmissionDto);
+    return this.quizzesService.createSubmission(req.user, id, createSubmissionDto);
   }
 
   @ApiBearerAuth()
   @Get()
-  @ApiExtraModels(Quiz, QuizAttempt)
   @ApiOkResponse({
     schema: {
-      anyOf: refs(Quiz, QuizAttempt)
+      type: 'array',
+      items: {
+        oneOf: [
+          { $ref: getSchemaPath(Quiz) },
+          { $ref: getSchemaPath(QuizAttempt) }
+        ],
+      },
     },
-    isArray: true,
   })
   findAll(
     @Request() req,
@@ -71,7 +77,7 @@ export class QuizzesController {
   @ApiExtraModels(FullQuiz, QuizQuestion)
   @ApiOkResponse({
     schema: {
-      anyOf: refs(FullQuiz, QuizQuestion)
+      oneOf: refs(FullQuiz, QuizQuestion)
     },
   })
   findOne(
