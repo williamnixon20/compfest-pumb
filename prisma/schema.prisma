@@ -62,8 +62,8 @@ model Option {
 model Answer {
   question_id Int         @id
   question    Question    @relation(fields: [question_id], references: [id])
-  option_id   Int?        @unique
-  option      Option?     @relation(fields: [option_id], references: [id])
+  correct_id  Int?        @unique
+  option      Option?     @relation(fields: [correct_id], references: [id])
   feedback    String?
 }
 

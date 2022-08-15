@@ -8,5 +8,5 @@ export class UpdateAnswerDto {
     @IsNotEmpty()
     @IsNumber()
     @ApiProperty()
-    option_id: number;
+    correct_id: number;
 }
