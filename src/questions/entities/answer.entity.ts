@@ -5,7 +5,7 @@ export class Answer {
     question_id: number;
 
     @ApiProperty()
-    option_id: number;
+    correct_id: number;
 
     @ApiProperty()
     feedback: string;

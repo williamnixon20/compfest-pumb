@@ -1,6 +1,6 @@
 import { ApiProperty } from "@nestjs/swagger";
 
-export class Answer {
+export class UserAnswer {
     @ApiProperty()
     question_id: number;
 
@@ -8,8 +8,8 @@ export class Answer {
     option_id: number;
 
     @ApiProperty()
-    feedback: string;
+    correct_id: number;
 
     @ApiProperty()
-    correct_id: number;
+    feedback: string;
 }
