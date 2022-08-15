@@ -4,6 +4,7 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import {
+  Course,
   CourseStatus,
   Status,
   User,
@@ -15,46 +16,63 @@ import { UpdateStatusDto, UpdateStatusObject } from './dto/admin.dto';
 @Injectable()
 export class AdminService {
   constructor(private prisma: PrismaService) {}
-  async findAllPendingCourse(user: User): Promise<CourseStatus[]> {
+  async findAllPendingCourse(user: User): Promise<Course[]> {
     if (user.role !== UserRole.ADMIN)
       throw new UnauthorizedException(
         'You are not allowed to access this resource!',
       );
     try {
-      return await this.prisma.courseStatus.findMany({
+      return await this.prisma.course.findMany({
         where: {
-          OR: [{ status: Status.VERIFYING }],
+          course_status: {
+            status: Status.VERIFYING,
+          },
         },
         include: {
-          course: true,
+          categories: true,
+          teacher: {
+            include: {
+              user: {
+                select: {
+                  username: true,
+                  email: true,
+                },
+              },
+            },
+          },
+          course_status: true,
+          _count: {
+            select: {
+              followers: true,
+            },
+          },
         },
       });
     } catch (err) {
       throw new BadRequestException("Can't fetch course!", err.message);
     }
   }
-  async findAllPendingTeacher(user: User): Promise<UserStatus[]> {
+  async findAllPendingTeacher(user: User): Promise<any> {
     if (user.role !== UserRole.ADMIN)
       throw new UnauthorizedException(
         'You are not allowed to access this resource!',
       );
     try {
-      return await this.prisma.userStatus.findMany({
+      return await this.prisma.user.findMany({
         where: {
-          OR: [{ status: Status.VERIFYING }],
-        },
-        include: {
-          user: {
-            select: {
-              id: true,
-              email: true,
-              first_name: true,
-              last_name: true,
-              username: true,
-              role: true,
-              created_at: true,
-            },
+          status: {
+            status: Status.VERIFYING,
           },
+        },
+        select: {
+          id: true,
+          email: true,
+          first_name: true,
+          last_name: true,
+          username: true,
+          role: true,
+          created_at: true,
+          status: true,
         },
       });
     } catch (err) {
