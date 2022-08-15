@@ -15,5 +15,5 @@ export class Submission {
     score: number;
 
     @ApiProperty({ type: [UserAnswer] })
-    answers: UserAnswer[];
+    answers?: UserAnswer[];
 }
