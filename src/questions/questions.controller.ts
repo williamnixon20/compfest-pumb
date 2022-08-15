@@ -18,6 +18,10 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { Question } from './entities/question.entity';
+import { FullQuestion } from './entities/full-question.entity';
+import { Answer } from './entities/answer.entity';
+import { UpdateAnswerDto } from './dto/update-answer.dto';
+import { UpdateFeedbackDto } from './dto/update-feedback.dto';
 
 @Controller('questions')
 @ApiTags('questions')
@@ -26,7 +30,7 @@ export class QuestionsController {
 
   @ApiBearerAuth()
   @Post()
-  @ApiCreatedResponse({ type: Question})
+  @ApiCreatedResponse({ type: Question })
   create(
     @Body() createQuestionDto: CreateQuestionDto,
   ) {
@@ -35,18 +39,27 @@ export class QuestionsController {
 
   @ApiBearerAuth()
   @Get()
-  @ApiOkResponse({ type: Question, isArray: true })
+  @ApiOkResponse({ type: FullQuestion, isArray: true })
   findAll() {
     return this.questionsService.findAll();
   }
 
   @ApiBearerAuth()
   @Get(':id')
-  @ApiOkResponse({ type: Question })
+  @ApiOkResponse({ type: FullQuestion })
   findOne(
     @Param('id', ParseIntPipe) id: number,
   ) {
     return this.questionsService.findOne(id);
+  }
+
+  @ApiBearerAuth()
+  @Get(':id/answer')
+  @ApiOkResponse({ type: Answer })
+  findAnswer(
+    @Param('id', ParseIntPipe) id: number,
+  ) {
+    return this.questionsService.findAnswer(id);
   }
 
   @ApiBearerAuth()
@@ -57,6 +70,26 @@ export class QuestionsController {
     @Body() updateQuestionDto: UpdateQuestionDto,
   ) {
     return this.questionsService.update(id, updateQuestionDto);
+  }
+
+  @ApiBearerAuth()
+  @Patch(':id/answer')
+  @ApiOkResponse()
+  updateCorrectAnswer(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() updateAnswerDto: UpdateAnswerDto,
+  ) {
+    return this.questionsService.updateAnswer(id, updateAnswerDto);
+  }
+
+  @ApiBearerAuth()
+  @Patch(':id/feedback')
+  @ApiOkResponse()
+  updateFeedback(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() updateFeedbackDto: UpdateFeedbackDto,
+  ) {
+    return this.questionsService.updateFeedback(id, updateFeedbackDto);
   }
 
   @ApiBearerAuth()

@@ -60,22 +60,21 @@ model Option {
 }
 
 model Answer {
-  question_id Int         @unique
+  question_id Int         @id
   question    Question    @relation(fields: [question_id], references: [id])
-  option_id   Int         @unique
-  option      Option      @relation(fields: [option_id], references: [id])
-  feedback    String
-
-  @@id([question_id, option_id])
+  correct_id  Int?        @unique
+  option      Option?     @relation(fields: [correct_id], references: [id])
+  feedback    String?
 }
 
 model OptionOnQuestion {
-  id           Int        @id @default(autoincrement())
-  question_id  Int
-  question     Question   @relation(fields: [question_id], references: [id])
-  option_id    Int
-  option       Option     @relation(fields: [option_id], references: [id])
-  user_quizzes UserOnQuiz[]
+  id                Int        @id @default(autoincrement())
+  question_id       Int
+  question          Question   @relation(fields: [question_id], references: [id])
+  option_id         Int
+  option            Option     @relation(fields: [option_id], references: [id])
+  user_quizzes_id   Int
+  user_quizzes      UserOnQuiz @relation(fields: [user_quizzes_id], references: [id])
 }
 
 model Course {
@@ -115,6 +114,7 @@ model Lecture {
 
 model Resource {
   id         Int          @id @default(autoincrement())
+  name       String
   type       ResourceType
   url        String
   lecture_id Int
@@ -152,6 +152,8 @@ model UserOnQuiz {
   quiz             Quiz             @relation(fields: [quiz_id], references: [id])
   score            Int
   answers          OptionOnQuestion[]
+  
+  @@unique([user_id, quiz_id])
 }
 
 enum UserRole {

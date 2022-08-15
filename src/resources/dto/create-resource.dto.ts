@@ -10,6 +10,11 @@ import {
 export class CreateResourceDto {
     @IsNotEmpty()
     @IsString()
+    @ApiProperty()
+    name: string;
+
+    @IsNotEmpty()
+    @IsString()
     @IsEnum(ResourceType)
     @ApiProperty({ enum: ResourceType })
     type: ResourceType;
