@@ -15,12 +15,17 @@ import { UpdateQuizDto } from './dto/update-quiz.dto';
 import {
   ApiBearerAuth,
   ApiCreatedResponse,
+  ApiExtraModels,
   ApiOkResponse,
   ApiTags,
+  refs,
 } from '@nestjs/swagger';
 import { Quiz } from './entities/quiz.entity';
 import { CreateSubmissionDto } from './dto/create-submission.dto';
 import { Submission } from './entities/submission.entity';
+import { QuizAttempt } from './entities/quiz-attempt.entity';
+import { QuizQuestion } from './entities/quiz-question.entity';
+import { FullQuiz } from './entities/full-quiz.entity';
 
 @Controller('quizzes')
 @ApiTags('quizzes')
@@ -48,18 +53,32 @@ export class QuizzesController {
 
   @ApiBearerAuth()
   @Get()
-  @ApiOkResponse({ type: Quiz, isArray: true })
-  findAll() {
-    return this.quizzesService.findAll();
+  @ApiExtraModels(Quiz, QuizAttempt)
+  @ApiOkResponse({
+    schema: {
+      anyOf: refs(Quiz, QuizAttempt)
+    },
+    isArray: true,
+  })
+  findAll(
+    @Request() req,
+  ) {
+    return this.quizzesService.findAll(req.user);
   }
 
   @ApiBearerAuth()
   @Get(':id')
-  @ApiOkResponse({ type: Quiz })
+  @ApiExtraModels(FullQuiz, QuizQuestion)
+  @ApiOkResponse({
+    schema: {
+      anyOf: refs(FullQuiz, QuizQuestion)
+    },
+  })
   findOne(
+    @Request() req,
     @Param('id', ParseIntPipe) id: number,
   ) {
-    return this.quizzesService.findOne(id);
+    return this.quizzesService.findOne(id, req.user);
   }
 
   @ApiBearerAuth()

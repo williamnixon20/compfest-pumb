@@ -4,7 +4,7 @@ import {
     IsNotEmpty,
     IsNumber,
 } from "class-validator";
-import { OptionQuestion } from "../entities/option-question.entity";
+import { CreateAnswerDto } from "./create-answer.dto";
 
 export class CreateSubmissionDto {
     @IsNotEmpty()
@@ -14,6 +14,6 @@ export class CreateSubmissionDto {
 
     @IsNotEmpty()
     @IsArray()
-    @ApiProperty({ type: [OptionQuestion] })
-    answers: OptionQuestion[];
+    @ApiProperty({ type: [CreateAnswerDto] })
+    answers: CreateAnswerDto[];
 }

@@ -1,5 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { OptionQuestion } from "./option-question.entity";
+import { Answer } from "./answer.entity";
 
 export class Submission {
     @ApiProperty()
@@ -14,6 +14,6 @@ export class Submission {
     @ApiProperty()
     score: number;
 
-    @ApiProperty()
-    answers: OptionQuestion[];
+    @ApiProperty({ type: [Answer] })
+    answers: Answer[];
 }
