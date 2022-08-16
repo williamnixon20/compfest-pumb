@@ -1,5 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { FullQuestion } from "src/questions/entities/full-question.entity";
+import { Question } from "src/questions/entities/question.entity";
 
 export class Quiz {
     @ApiProperty()
@@ -15,5 +15,5 @@ export class Quiz {
     attempt?: boolean;
 
     @ApiProperty()
-    questions?: FullQuestion[];
+    questions?: Question[];
 }
