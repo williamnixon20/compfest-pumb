@@ -150,7 +150,7 @@ export class CoursesService {
           },
         },
       });
-      return this.isEnrolledMapper([course], user);
+      return this.isEnrolledMapper([course], user)[0];
     } catch (err) {
       throw new BadRequestException("Can't fetch course!", err.message);
     }
