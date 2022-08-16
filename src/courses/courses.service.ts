@@ -150,7 +150,7 @@ export class CoursesService {
           },
         },
       });
-      return this.isEnrolledMapper([course], user);
+      return this.isEnrolledMapper([course], user)[0];
     } catch (err) {
       throw new BadRequestException("Can't fetch course!", err.message);
     }
@@ -205,36 +205,54 @@ export class CoursesService {
 
     if (user.role === UserRole.TEACHER) {
       teacherQuery = {
-        teachers: {
-          include: {
-            course: true,
+        teacher: {
+          some: {
+            user_id: user.id,
           },
         },
       };
     }
     if (user.role === UserRole.STUDENT) {
       studentQuery = {
-        subscribers: {
-          include: {
-            course: true,
+        followers: {
+          some: {
+            user_id: user.id,
           },
         },
       };
     }
     try {
-      return await this.prisma.user.findUnique({
+      const courses = await this.prisma.course.findMany({
         where: {
-          id: +user.id,
-        },
-        select: {
-          id: true,
-          username: true,
-          email: true,
-          role: true,
           ...teacherQuery,
           ...studentQuery,
         },
+        include: {
+          categories: true,
+          teacher: {
+            include: {
+              user: {
+                select: {
+                  username: true,
+                  email: true,
+                },
+              },
+            },
+          },
+          course_status: true,
+          _count: {
+            select: {
+              followers: true,
+            },
+          },
+          followers: {
+            where: {
+              user_id: user.id,
+            },
+          },
+        },
       });
+      return this.isEnrolledMapper(courses, user);
     } catch (err) {
       throw new BadRequestException("Can't fetch course!", err.message);
     }
