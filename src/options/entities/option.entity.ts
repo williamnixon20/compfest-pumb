@@ -6,4 +6,7 @@ export class Option {
 
     @ApiProperty()
     content: string;
+
+    @ApiProperty()
+    question_id?: number;
 }
