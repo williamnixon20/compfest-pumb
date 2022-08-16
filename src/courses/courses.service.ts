@@ -4,11 +4,8 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { Status, User, UserRole } from '@prisma/client';
-import { Lecture } from 'src/lectures/entities/lecture.entity';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { Quiz } from 'src/quizzes/entities/quiz.entity';
 import { CreateCourseDto } from './dto/course.dto';
-import { Course } from './entities/course.entity';
 
 @Injectable()
 export class CoursesService {
@@ -82,7 +79,7 @@ export class CoursesService {
       };
     }
     try {
-      return await this.prisma.course.findMany({
+      const courses = await this.prisma.course.findMany({
         where: {
           ...queryCourse,
           ...queryCateg,
@@ -115,6 +112,8 @@ export class CoursesService {
           },
         },
       });
+
+      return this.isEnrolledMapper(courses, user);
     } catch (err) {
       throw new BadRequestException("Can't fetch course!", err.message);
     }
@@ -122,7 +121,7 @@ export class CoursesService {
 
   async findOne(id: number, user) {
     try {
-      return await this.prisma.course.findUnique({
+      const course = await this.prisma.course.findUnique({
         where: {
           id: id,
         },
@@ -144,8 +143,14 @@ export class CoursesService {
               followers: true,
             },
           },
+          followers: {
+            where: {
+              user_id: user.id,
+            },
+          },
         },
       });
+      return this.isEnrolledMapper([course], user);
     } catch (err) {
       throw new BadRequestException("Can't fetch course!", err.message);
     }
@@ -233,6 +238,18 @@ export class CoursesService {
     } catch (err) {
       throw new BadRequestException("Can't fetch course!", err.message);
     }
+  }
+
+  isEnrolledMapper(courses, user) {
+    const isStudent = user.role === UserRole.STUDENT;
+    return courses.map((course) => {
+      if (isStudent && course['followers'].length === 0) {
+        course['enrolled'] = false;
+      } else {
+        course['enrolled'] = true;
+      }
+      return course;
+    });
   }
 
   // update(id: number, updateCourseDto: UpdateCourseDto) {
