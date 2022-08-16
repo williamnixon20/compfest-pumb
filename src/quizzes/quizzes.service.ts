@@ -37,7 +37,7 @@ export class QuizzesService {
 
     try {
       const score: number = await this.calculateScore(createSubmissionDto);
-      return await this.prisma.userOnQuiz.create({
+      return await this.prisma.submission.create({
         data: {
           user_id: user.id,
           quiz_id: quizId,
@@ -104,7 +104,7 @@ export class QuizzesService {
     }
 
     try {
-      const submission = await this.prisma.userOnQuiz.findUniqueOrThrow({
+      const submission = await this.prisma.submission.findUniqueOrThrow({
         where: {
           user_id_quiz_id: {
             user_id: user.id,
@@ -191,7 +191,7 @@ export class QuizzesService {
   }
 
   async checkAttempt(userId: number, quizId: number) {
-    const totalAttempt: number = await this.prisma.userOnQuiz.count({
+    const totalAttempt: number = await this.prisma.submission.count({
       where: { 
         user_id: userId,
         quiz_id: quizId,
