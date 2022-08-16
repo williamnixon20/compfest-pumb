@@ -1,4 +1,12 @@
-import { PartialType } from '@nestjs/swagger';
-import { CreateQuizDto } from './create-quiz.dto';
+import { ApiProperty } from "@nestjs/swagger";
+import {
+    IsNotEmpty,
+    IsString,
+} from "class-validator";
 
-export class UpdateQuizDto extends PartialType(CreateQuizDto) {}
+export class UpdateQuizDto {
+    @IsNotEmpty()
+    @IsString()
+    @ApiProperty()
+    title?: string;
+}

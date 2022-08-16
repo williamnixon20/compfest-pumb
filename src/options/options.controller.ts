@@ -7,6 +7,7 @@ import {
   Param,
   Delete,
   ParseIntPipe,
+  Request,
 } from '@nestjs/common';
 import { OptionsService } from './options.service';
 import { CreateOptionDto } from './dto/create-option.dto';
@@ -17,7 +18,7 @@ import {
   ApiOkResponse,
   ApiTags,
 } from '@nestjs/swagger';
-import { FullOption } from './entities/full-option.entity';
+import { Option } from './entities/option.entity';
 
 @Controller('options')
 @ApiTags('options')
@@ -26,23 +27,24 @@ export class OptionsController {
 
   @ApiBearerAuth()
   @Post()
-  @ApiCreatedResponse({ type: FullOption })
+  @ApiCreatedResponse({ type: Option })
   create(
+    @Request() req,
     @Body() createOptionDto: CreateOptionDto,
   ) {
-    return this.optionsService.create(createOptionDto);
+    return this.optionsService.create(req.user, createOptionDto);
   }
 
   @ApiBearerAuth()
   @Get()
-  @ApiOkResponse({ type: FullOption, isArray: true })
+  @ApiOkResponse({ type: Option, isArray: true })
   findAll() {
     return this.optionsService.findAll();
   }
 
   @ApiBearerAuth()
   @Get(':id')
-  @ApiOkResponse({ type: FullOption })
+  @ApiOkResponse({ type: Option })
   findOne(
     @Param('id', ParseIntPipe) id: number,
   ) {
@@ -51,19 +53,22 @@ export class OptionsController {
 
   @ApiBearerAuth()
   @Patch(':id')
-  @ApiOkResponse({ type: FullOption })
+  @ApiOkResponse({ type: Option })
   update(
+    @Request() req,
     @Param('id', ParseIntPipe) id: number,
     @Body() updateOptionDto: UpdateOptionDto,
   ) {
-    return this.optionsService.update(id, updateOptionDto);
+    return this.optionsService.update(req.user, id, updateOptionDto);
   }
 
   @ApiBearerAuth()
   @Delete(':id')
-  @ApiOkResponse({ type: FullOption })
-  remove(@Param('id', ParseIntPipe) id: number,
+  @ApiOkResponse({ type: Option })
+  remove(
+    @Request() req,
+    @Param('id', ParseIntPipe) id: number,
   ) {
-    return this.optionsService.remove(id);
+    return this.optionsService.remove(req.user, id);
   }
 }

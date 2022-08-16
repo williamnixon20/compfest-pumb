@@ -19,7 +19,7 @@ model User {
   role        UserRole
   subscribers StudentsOnCourses[]
   teachers    TeachersOnCourses[]
-  quizzes     UserOnQuiz[]
+  submission  Submission[]
   status      UserStatus?
 }
 
@@ -37,7 +37,7 @@ model Quiz {
   course_id   Int
   course      Course      @relation(fields: [course_id], references: [id])
   questions   Question[]
-  attempts    UserOnQuiz[]
+  submission  Submission[]
 }
 
 model Question {
@@ -73,8 +73,8 @@ model OptionOnQuestion {
   question          Question   @relation(fields: [question_id], references: [id])
   option_id         Int
   option            Option     @relation(fields: [option_id], references: [id])
-  user_quizzes_id   Int
-  user_quizzes      UserOnQuiz @relation(fields: [user_quizzes_id], references: [id])
+  submission_id     Int
+  submission        Submission @relation(fields: [submission_id], references: [id])
 }
 
 model Course {
@@ -144,7 +144,7 @@ model TeachersOnCourses {
   @@id([course_id, user_id])
 }
 
-model UserOnQuiz {
+model Submission {
   id               Int              @id @default(autoincrement())
   user_id          Int
   user             User             @relation(fields: [user_id], references: [id])

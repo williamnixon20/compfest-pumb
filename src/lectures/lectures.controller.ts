@@ -7,6 +7,7 @@ import {
   Param,
   Delete,
   ParseIntPipe,
+  Request,
 } from '@nestjs/common';
 import { LecturesService } from './lectures.service';
 import { CreateLectureDto } from './dto/create-lecture.dto';
@@ -29,9 +30,10 @@ export class LecturesController {
   @Post()
   @ApiCreatedResponse({ type: Lecture })
   create(
+    @Request() req,
     @Body() createLectureDto: CreateLectureDto,
   ) {
-    return this.lecturesService.create(createLectureDto);
+    return this.lecturesService.create(req.user, createLectureDto);
   }
 
   @ApiBearerAuth()
@@ -64,18 +66,20 @@ export class LecturesController {
   @Patch(':id')
   @ApiOkResponse({ type: Lecture })
   update(
+    @Request() req,
     @Param('id', ParseIntPipe) id: number,
     @Body() updateLectureDto: UpdateLectureDto,
   ) {
-    return this.lecturesService.update(id, updateLectureDto);
+    return this.lecturesService.update(req.user, id, updateLectureDto);
   }
 
   @ApiBearerAuth()
   @Delete(':id')
   @ApiOkResponse({ type: Lecture })
   remove(
+    @Request() req,
     @Param('id', ParseIntPipe) id: number,
   ) {
-    return this.lecturesService.remove(id);
+    return this.lecturesService.remove(req.user, id);
   }
 }
