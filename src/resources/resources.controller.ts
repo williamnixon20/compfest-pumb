@@ -7,6 +7,7 @@ import {
   Param,
   Delete,
   ParseIntPipe,
+  Request,
 } from '@nestjs/common';
 import { ResourcesService } from './resources.service';
 import { CreateResourceDto } from './dto/create-resource.dto';
@@ -28,9 +29,10 @@ export class ResourcesController {
   @Post()
   @ApiCreatedResponse({ type: Resource })
   create(
+    @Request() req,
     @Body() createResourceDto: CreateResourceDto,
   ) {
-    return this.resourcesService.create(createResourceDto);
+    return this.resourcesService.create(req.user, createResourceDto);
   }
 
   @ApiBearerAuth()
@@ -53,18 +55,20 @@ export class ResourcesController {
   @Patch(':id')
   @ApiOkResponse({ type: Resource })
   update(
+    @Request() req,
     @Param('id', ParseIntPipe) id: number,
     @Body() updateResourceDto: UpdateResourceDto,
   ) {
-    return this.resourcesService.update(id, updateResourceDto);
+    return this.resourcesService.update(req.user, id, updateResourceDto);
   }
 
   @ApiBearerAuth()
   @Delete(':id')
   @ApiOkResponse({ type: Resource })
   remove(
+    @Request() req,
     @Param('id', ParseIntPipe) id: number,
   ) {
-    return this.resourcesService.remove(id);
+    return this.resourcesService.remove(req.user, id);
   }
 }

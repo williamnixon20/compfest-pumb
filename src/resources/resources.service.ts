@@ -1,4 +1,9 @@
-import { Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  ForbiddenException,
+  Injectable,
+} from '@nestjs/common';
+import { User, UserRole } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateResourceDto } from './dto/create-resource.dto';
 import { UpdateResourceDto } from './dto/update-resource.dto';
@@ -7,41 +12,64 @@ import { UpdateResourceDto } from './dto/update-resource.dto';
 export class ResourcesService {
   constructor(private readonly prisma: PrismaService) {}
 
-  create(
-    createResourceDto: CreateResourceDto,
-  ) {
-    return this.prisma.resource.create({
-      data: createResourceDto,
-    });
+  create(user: User, createResourceDto: CreateResourceDto) {
+    if (user.role !== UserRole.TEACHER) {
+      throw new ForbiddenException("You are not allowed to access this resource!");
+    }
+
+    try {
+      return this.prisma.resource.create({
+        data: createResourceDto,
+      }); 
+    } catch (err) {
+      throw new BadRequestException("Can't create resource!", err.message);
+    }
   }
 
   findAll() {
-    return this.prisma.resource.findMany();
+    try {
+      return this.prisma.resource.findMany(); 
+    } catch (err) {
+      throw new BadRequestException("Can't fetch resource!", err.message);
+    }
   }
 
-  findOne(
-    id: number,
-  ) {
-    return this.prisma.resource.findUnique({
-      where: { id },
-    });
+  findOne(id: number) {
+    try {
+      return this.prisma.resource.findUniqueOrThrow({
+        where: { id },
+      }); 
+    } catch (err) {
+      throw new BadRequestException("Can't fetch resource!", err.message);
+    }
   }
 
-  update(
-    id: number,
-    updateResourceDto: UpdateResourceDto,
-  ) {
-    return this.prisma.resource.update({
-      where: { id },
-      data: updateResourceDto,
-    });
+  update(user: User, id: number, updateResourceDto: UpdateResourceDto) {
+    if (user.role !== UserRole.TEACHER) {
+      throw new ForbiddenException("You are not allowed to access this resource!");
+    }
+
+    try {
+      return this.prisma.resource.update({
+        where: { id },
+        data: updateResourceDto,
+      });
+    } catch (err) {
+      throw new BadRequestException("Failed to update resource!", err.message);
+    }
   }
 
-  remove(
-    id: number,
-  ) {
-    return this.prisma.resource.delete({
-      where: { id },
-    });
+  remove(user: User, id: number) {
+    if (user.role !== UserRole.TEACHER) {
+      throw new ForbiddenException("You are not allowed to access this resource!");
+    }
+
+    try {
+      return this.prisma.resource.delete({
+        where: { id },
+      });
+    } catch (err) {
+      throw new BadRequestException("Failed to delete resource!", err.message);
+    }
   }
 }
