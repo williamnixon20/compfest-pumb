@@ -15,18 +15,12 @@ import { UpdateQuizDto } from './dto/update-quiz.dto';
 import {
   ApiBearerAuth,
   ApiCreatedResponse,
-  ApiExtraModels,
   ApiOkResponse,
   ApiTags,
-  getSchemaPath,
-  refs,
 } from '@nestjs/swagger';
 import { Quiz } from './entities/quiz.entity';
 import { CreateSubmissionDto } from './dto/create-submission.dto';
 import { Submission } from './entities/submission.entity';
-import { QuizAttempt } from './entities/quiz-attempt.entity';
-import { QuizQuestion } from './entities/quiz-question.entity';
-import { FullQuiz } from './entities/full-quiz.entity';
 
 @Controller('quizzes')
 @ApiTags('quizzes')
@@ -37,9 +31,10 @@ export class QuizzesController {
   @Post()
   @ApiCreatedResponse({ type: Quiz })
   create(
+    @Request() req,
     @Body() createQuizDto: CreateQuizDto,
   ) {
-    return this.quizzesService.create(createQuizDto);
+    return this.quizzesService.create(req.user, createQuizDto);
   }
 
   @ApiBearerAuth()
@@ -55,17 +50,7 @@ export class QuizzesController {
 
   @ApiBearerAuth()
   @Get()
-  @ApiOkResponse({
-    schema: {
-      type: 'array',
-      items: {
-        oneOf: [
-          { $ref: getSchemaPath(Quiz) },
-          { $ref: getSchemaPath(QuizAttempt) }
-        ],
-      },
-    },
-  })
+  @ApiOkResponse({ type: [Quiz] })
   findAll(
     @Request() req,
   ) {
@@ -74,17 +59,12 @@ export class QuizzesController {
 
   @ApiBearerAuth()
   @Get(':id')
-  @ApiExtraModels(FullQuiz, QuizQuestion)
-  @ApiOkResponse({
-    schema: {
-      oneOf: refs(FullQuiz, QuizQuestion)
-    },
-  })
+  @ApiOkResponse({ type: Quiz })
   findOne(
     @Request() req,
     @Param('id', ParseIntPipe) id: number,
   ) {
-    return this.quizzesService.findOne(id, req.user);
+    return this.quizzesService.findOne(req.user, id);
   }
 
   @ApiBearerAuth()
@@ -94,17 +74,18 @@ export class QuizzesController {
     @Request() req,
     @Param('id', ParseIntPipe) id: number,
   ) {
-    return this.quizzesService.findSubmission(id, req.user);
+    return this.quizzesService.findSubmission(req.user, id);
   }
 
   @ApiBearerAuth()
   @Patch(':id')
   @ApiOkResponse({ type: Quiz })
   update(
+    @Request() req,
     @Param('id', ParseIntPipe) id: number,
     @Body() updateQuizDto: UpdateQuizDto,
   ) {
-    return this.quizzesService.update(id, updateQuizDto);
+    return this.quizzesService.update(req.user, id, updateQuizDto);
   }
 
   @ApiBearerAuth()
@@ -112,8 +93,9 @@ export class QuizzesController {
   @Delete(':id')
   @ApiOkResponse({ type: Quiz })
   remove(
+    @Request() req,
     @Param('id', ParseIntPipe) id: number,
   ) {
-    return this.quizzesService.remove(id);
+    return this.quizzesService.remove(req.user, id);
   }
 }
