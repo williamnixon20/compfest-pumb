@@ -41,22 +41,13 @@ model Quiz {
 }
 
 model Question {
-  id                Int              @id @default(autoincrement())
-  statement         String
-  feedback          String
-  quiz_id           Int
-  quiz              Quiz             @relation(fields: [quiz_id], references: [id])
-  MultipleChoice    MultipleChoice?
-  question_attempts QuestionAnswer[]
-}
-
-model QuestionAnswer {
-  id           Int        @id @default(autoincrement())
-  user_quiz_id Int
-  question_id  Int
-  answer       Int
-  question     Question   @relation(fields: [question_id], references: [id])
-  user_quiz    UserOnQuiz @relation(fields: [user_quiz_id], references: [id])
+  id               Int                @id @default(autoincrement())
+  statement        String
+  quiz_id          Int
+  quiz             Quiz               @relation(fields: [quiz_id], references: [id])
+  Answer           Answer?
+  Option           Option[]
+  OptionOnQuestion OptionOnQuestion[]
 }
 
 model Course {
@@ -126,25 +117,41 @@ model TeachersOnCourses {
 }
 
 model UserOnQuiz {
-  id               Int              @id @default(autoincrement())
+  id               Int                @id @default(autoincrement())
   user_id          Int
   quiz_id          Int
   score            Int
-  quiz             Quiz             @relation(fields: [quiz_id], references: [id])
-  user             User             @relation(fields: [user_id], references: [id])
-  received_answers QuestionAnswer[]
+  quiz             Quiz               @relation(fields: [quiz_id], references: [id])
+  user             User               @relation(fields: [user_id], references: [id])
+  OptionOnQuestion OptionOnQuestion[]
 }
 
-model MultipleChoice {
-  id          Int      @id @default(autoincrement())
-  option_1    String
-  option_2    String
-  option_3    String
-  Option_4    String
-  feedback    String
-  answer      String
+model Answer {
   question_id Int      @unique
+  option_id   Int      @unique
+  feedback    String
+  Option      Option   @relation(fields: [option_id], references: [id])
   Question    Question @relation(fields: [question_id], references: [id])
+
+  @@id([question_id, option_id])
+}
+
+model Option {
+  id               Int                @id @default(autoincrement())
+  content          String
+  question_id      Int
+  Question         Question           @relation(fields: [question_id], references: [id])
+  Answer           Answer?
+  OptionOnQuestion OptionOnQuestion[]
+}
+
+model OptionOnQuestion {
+  id          Int          @id @default(autoincrement())
+  question_id Int
+  option_id   Int
+  Option      Option       @relation(fields: [option_id], references: [id])
+  Question    Question     @relation(fields: [question_id], references: [id])
+  UserOnQuiz  UserOnQuiz[]
 }
 
 enum UserRole {

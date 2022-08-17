@@ -11,7 +11,7 @@ import { CoursesModule } from './courses/courses.module';
 import { QuizzesModule } from './quizzes/quizzes.module';
 import { AdminModule } from './admin/admin.module';
 import { ResourcesModule } from './resources/resources.module';
-
+import { AwsModule } from './aws/aws.module';
 @Module({
   imports: [
     PrismaModule,
@@ -24,6 +24,7 @@ import { ResourcesModule } from './resources/resources.module';
     QuizzesModule,
     AdminModule,
     ResourcesModule,
+    AwsModule,
   ],
   controllers: [],
   providers: [

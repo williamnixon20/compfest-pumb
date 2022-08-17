@@ -6,22 +6,24 @@ import {
 import { Status, User, UserRole } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateCourseDto } from './dto/course.dto';
-
+import { AwsService } from 'src/aws/aws.service';
 @Injectable()
 export class CoursesService {
-  constructor(private prisma: PrismaService) {}
-  async create(data: CreateCourseDto, user: User) {
-    if (user.role !== UserRole.TEACHER)
-      throw new UnauthorizedException(
-        'You are not allowed to access this resource!',
-      );
+  constructor(private prisma: PrismaService, private awsService: AwsService) {}
+  async create(data: any, file: Express.Multer.File, user: User) {
+    // if (user.role !== UserRole.TEACHER)
+    //   throw new UnauthorizedException(
+    //     'You are not allowed to access this resource!',
+    //   );
     const { categories, ...course } = data;
+    const uploadedFileUrl = await this.awsService.upload(file);
+    course['thumbnail_url'] = uploadedFileUrl;
     try {
       const courses = this.prisma.course.create({
         data: {
           ...course,
           categories: {
-            connectOrCreate: categories.map((category) => {
+            connectOrCreate: JSON.parse(categories).map((category) => {
               return {
                 where: { name: category.name },
                 create: { name: category.name },
