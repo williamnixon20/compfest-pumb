@@ -23,7 +23,7 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { Resource } from './entities/resource.entity';
-
+import { Express } from 'express';
 @Controller('resources')
 @ApiTags('resources')
 export class ResourcesController {
