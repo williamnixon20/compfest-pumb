@@ -5,71 +5,64 @@ import {
 } from '@nestjs/common';
 import { User, UserRole } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { CreateResourceDto } from './dto/create-resource.dto';
-import { UpdateResourceDto } from './dto/update-resource.dto';
+import { AwsService } from 'src/aws/aws.service';
 
 @Injectable()
 export class ResourcesService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private awsService: AwsService,
+  ) {}
 
-  create(user: User, createResourceDto: CreateResourceDto) {
-    if (user.role !== UserRole.TEACHER) {
-      throw new ForbiddenException("You are not allowed to access this resource!");
+  async create(createResourceDto, file, user) {
+    // if (user.role !== UserRole.TEACHER) {
+    //   throw new ForbiddenException(
+    //     'You are not allowed to access this resource!',
+    //   );
+    // }
+    const { lecture_id, ...createResourceData } = createResourceDto;
+    if (file) {
+      const uploadedFileUrl = await this.awsService.upload(file);
+      createResourceData['url'] = uploadedFileUrl;
     }
-
-    try {
-      return this.prisma.resource.create({
-        data: createResourceDto,
-      }); 
-    } catch (err) {
-      throw new BadRequestException("Can't create resource!", err.message);
-    }
+    return await this.prisma.resource.create({
+      data: {
+        ...createResourceData,
+        lecture: {
+          connect: { id: +lecture_id },
+        },
+      },
+    });
   }
 
   findAll() {
     try {
-      return this.prisma.resource.findMany(); 
+      return this.prisma.resource.findMany();
     } catch (err) {
       throw new BadRequestException("Can't fetch resource!", err.message);
     }
   }
 
   findOne(id: number) {
-    try {
-      return this.prisma.resource.findUniqueOrThrow({
-        where: { id },
-      }); 
-    } catch (err) {
-      throw new BadRequestException("Can't fetch resource!", err.message);
-    }
+    return this.prisma.resource.findUnique({
+      where: { id },
+    });
   }
 
-  update(user: User, id: number, updateResourceDto: UpdateResourceDto) {
-    if (user.role !== UserRole.TEACHER) {
-      throw new ForbiddenException("You are not allowed to access this resource!");
+  async update(id: number, updateResourceDto, file, user) {
+    if (file) {
+      const uploadedFileUrl = await this.awsService.upload(file);
+      updateResourceDto['url'] = uploadedFileUrl;
     }
-
-    try {
-      return this.prisma.resource.update({
-        where: { id },
-        data: updateResourceDto,
-      });
-    } catch (err) {
-      throw new BadRequestException("Failed to update resource!", err.message);
-    }
+    return this.prisma.resource.update({
+      where: { id },
+      data: updateResourceDto,
+    });
   }
 
-  remove(user: User, id: number) {
-    if (user.role !== UserRole.TEACHER) {
-      throw new ForbiddenException("You are not allowed to access this resource!");
-    }
-
-    try {
-      return this.prisma.resource.delete({
-        where: { id },
-      });
-    } catch (err) {
-      throw new BadRequestException("Failed to delete resource!", err.message);
-    }
+  remove(id: number) {
+    return this.prisma.resource.delete({
+      where: { id },
+    });
   }
 }

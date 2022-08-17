@@ -10,6 +10,7 @@ import { CoursesModule } from './courses/courses.module';
 import { QuizzesModule } from './quizzes/quizzes.module';
 import { AdminModule } from './admin/admin.module';
 import { ResourcesModule } from './resources/resources.module';
+import { AwsModule } from './aws/aws.module';
 import { OptionsModule } from './options/options.module';
 
 @Module({
@@ -23,6 +24,7 @@ import { OptionsModule } from './options/options.module';
     QuizzesModule,
     AdminModule,
     ResourcesModule,
+    AwsModule,
     OptionsModule,
   ],
   controllers: [],

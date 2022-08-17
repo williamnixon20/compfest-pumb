@@ -8,9 +8,16 @@ import {
   Delete,
   Request,
   Query,
+  UseInterceptors,
+  UploadedFile,
+  ParseFilePipe,
 } from '@nestjs/common';
+
+import { FileInterceptor } from '@nestjs/platform-express';
 import {
   ApiBearerAuth,
+  ApiBody,
+  ApiConsumes,
   ApiCreatedResponse,
   ApiOkResponse,
   ApiQuery,
@@ -30,9 +37,16 @@ export class CoursesController {
 
   @Post()
   @ApiBearerAuth()
+  @ApiConsumes('multipart/form-data')
+  @UseInterceptors(FileInterceptor('file'))
   @ApiCreatedResponse({ type: Course })
-  create(@Request() req, @Body() createCourseDto: CreateCourseDto) {
-    return this.coursesService.create(createCourseDto, req.user);
+  create(
+    @Request() req,
+    @Body() createCourseDto: CreateCourseDto,
+    @UploadedFile()
+    file: Express.Multer.File,
+  ) {
+    return this.coursesService.create(createCourseDto, file, req.user);
   }
 
   @Get()
