@@ -12,7 +12,7 @@ import {
   UploadedFile,
   ParseFilePipe,
 } from '@nestjs/common';
-
+import { Express } from 'express';
 import { FileInterceptor } from '@nestjs/platform-express';
 import {
   ApiBearerAuth,
