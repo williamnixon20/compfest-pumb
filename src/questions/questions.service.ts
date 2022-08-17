@@ -9,30 +9,25 @@ import { CreateQuestionDto } from './dto/create-question.dto';
 import { UpdateAnswerDto } from './dto/update-answer.dto';
 import { UpdateFeedbackDto } from './dto/update-feedback.dto';
 import { UpdateQuestionDto } from './dto/update-question.dto';
-import { Question } from './entities/question.entity';
 
 @Injectable()
 export class QuestionsService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async create(user: User, createQuestionDto: CreateQuestionDto) {
+  create(user: User, createQuestionDto: CreateQuestionDto) {
     if (user.role !== UserRole.TEACHER) {
       throw new ForbiddenException("You are not allowed to access this resource!");
     }
 
     try {
-      const question: Question = await this.prisma.question.create({
-        data: createQuestionDto,
-      });
-  
-      const { id:question_id } = question;
-      await this.prisma.answer.create({
+      return this.prisma.question.create({
         data: {
-          question_id,
-        },
+          ...createQuestionDto,
+          answer: {
+            create: {}
+          }
+        }
       });
-  
-      return question; 
     } catch (err) {
       throw new BadRequestException("Can't create question!", err.message);
     }

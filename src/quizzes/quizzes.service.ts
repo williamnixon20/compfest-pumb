@@ -36,38 +36,27 @@ export class QuizzesService {
     }
 
     try {
-      const score: number = await this.calculateScore(createSubmissionDto);
-      const submission: Submission = await this.prisma.submission.create({
+      const score: number = await this.calculateScore(quizId, createSubmissionDto);
+      return await this.prisma.submission.create({
         data: {
           user_id: user.id,
           quiz_id: quizId,
-          score,
+          score: Math.ceil(score),
+          answers: {
+            createMany: {
+              data: createSubmissionDto,
+            }
+          }
         },
       });
-      await this.saveUserAnswer(submission.id, createSubmissionDto);
-      
-      return submission;
     } catch (err) {
       throw new BadRequestException("Failed to submit!", err.message);
     }
   }
 
-  async findAll(user: User) {
+  findAll(user: User) {
     try {
-      const quizzes: Quiz[] = await this.prisma.quiz.findMany();
-
-      if (user.role === UserRole.STUDENT) {
-        let quizzesAttempt: Quiz[] = [];
-        
-        for (let quiz of quizzes) {
-          const attempt: boolean = await this.checkAttempt(user.id, quiz.id);
-          const quizAttempt: Quiz = {...quiz, attempt};
-          quizzesAttempt.push(quizAttempt);
-        }
-        return quizzesAttempt;
-      }
-
-      return quizzes;
+      return this.prisma.quiz.findMany();
     } catch (err) {
       throw new BadRequestException("Can't fetch quiz!", err.message);
     }
@@ -81,9 +70,16 @@ export class QuizzesService {
         },
         include: {
           questions: {
-            include: {
-              options: true,
-            }
+            select: {
+              id: true,
+              statement: true,
+              options: {
+                select: {
+                  id: true,
+                  content: true,
+                }
+              }
+            },
           }
         }
       });
@@ -125,7 +121,7 @@ export class QuizzesService {
       });
   
       const userAnswers: UserAnswer[] = 
-        await this.checkAnswer(submission.answers);
+        await this.checkCorrectAnswer(submission.answers);
       const submissionWithFeedback: Submission =
         {...submission, answers: userAnswers};
   
@@ -164,8 +160,15 @@ export class QuizzesService {
     }
   }
 
-  async calculateScore(createSubmissionDto: CreateSubmissionDto[]) {
-    const totalQuestion: number = createSubmissionDto.length;
+  async calculateScore(quizId: number, createSubmissionDto: CreateSubmissionDto[]) {
+    const totalQuestion: number = 
+      await this.prisma.question.count({
+        where: {
+          quiz_id: quizId,
+        }
+      }
+    );
+
     let totalCorrectAnswer: number = 0;
 
     for (let answer of createSubmissionDto) {
@@ -201,7 +204,7 @@ export class QuizzesService {
     return isAttempt;
   }
 
-  async checkAnswer(userAnswers: CreateSubmissionDto[]) {
+  async checkCorrectAnswer(userAnswers: CreateSubmissionDto[]) {
     let checkedAnswers: UserAnswer[] = [];
 
     for (let answer of userAnswers) {
@@ -220,17 +223,5 @@ export class QuizzesService {
     }
 
     return checkedAnswers;
-  }
-
-  async saveUserAnswer(submissionId: number, userAnswers: CreateSubmissionDto[]) {
-    for (let answer of userAnswers) {
-      await this.prisma.optionOnQuestion.create({
-        data: {
-          question_id: answer.question_id,
-          option_id: answer.option_id,
-          submission_id: submissionId,
-        }
-      });
-    }
   }
 }
