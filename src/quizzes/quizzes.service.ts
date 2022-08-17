@@ -35,8 +35,21 @@ export class QuizzesService {
       throw new ForbiddenException("You are not allowed to access this resource!");
     }
 
+    const totalQuestion: number = 
+      await this.prisma.question.count({
+        where: {
+          quiz_id: quizId,
+        }
+      }
+    );
+
+    if (totalQuestion !== createSubmissionDto.length) {
+      throw new BadRequestException(`The total number of questions is ${totalQuestion}`);
+    }
+
     try {
-      const score: number = await this.calculateScore(quizId, createSubmissionDto);
+      const score: number = await this.calculateScore(totalQuestion, createSubmissionDto);
+
       return await this.prisma.submission.create({
         data: {
           user_id: user.id,
@@ -160,15 +173,7 @@ export class QuizzesService {
     }
   }
 
-  async calculateScore(quizId: number, createSubmissionDto: CreateSubmissionDto[]) {
-    const totalQuestion: number = 
-      await this.prisma.question.count({
-        where: {
-          quiz_id: quizId,
-        }
-      }
-    );
-
+  async calculateScore(totalQuestion: number, createSubmissionDto: CreateSubmissionDto[]) {
     let totalCorrectAnswer: number = 0;
 
     for (let answer of createSubmissionDto) {
