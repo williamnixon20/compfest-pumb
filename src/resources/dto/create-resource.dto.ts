@@ -15,8 +15,9 @@ export class CreateResourceDto {
   @ApiProperty({ enum: ResourceType })
   type: ResourceType;
 
+  @IsOptional()
   @ApiProperty({ type: 'string', format: 'binary' })
-  file: string;
+  file?: string;
 
   @IsNotEmpty()
   lecture_id: number;
@@ -27,5 +28,5 @@ export class CreateResourceDto {
 
   @IsOptional()
   @IsString()
-  url: string;
+  url?: string;
 }

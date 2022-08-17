@@ -15,20 +15,19 @@ export class ResourcesService {
   ) {}
 
   async create(createResourceDto, file, user) {
-    if (user.role !== UserRole.TEACHER) {
-      throw new ForbiddenException(
-        'You are not allowed to access this resource!',
-      );
-    }
-
-    const uploadedFileUrl = await this.awsService.upload(file);
-    createResourceDto['url'] = uploadedFileUrl;
+    // if (user.role !== UserRole.TEACHER) {
+    //   throw new ForbiddenException(
+    //     'You are not allowed to access this resource!',
+    //   );
+    // }
     const { lecture_id, ...createResourceData } = createResourceDto;
-    console.log(createResourceData);
+    if (file) {
+      const uploadedFileUrl = await this.awsService.upload(file);
+      createResourceData['url'] = uploadedFileUrl;
+    }
     return await this.prisma.resource.create({
       data: {
-        url: uploadedFileUrl,
-        type: createResourceData.type,
+        ...createResourceData,
         lecture: {
           connect: { id: +lecture_id },
         },
@@ -51,8 +50,10 @@ export class ResourcesService {
   }
 
   async update(id: number, updateResourceDto, file, user) {
-    const uploadedFileUrl = await this.awsService.upload(file);
-    updateResourceDto['url'] = uploadedFileUrl;
+    if (file) {
+      const uploadedFileUrl = await this.awsService.upload(file);
+      updateResourceDto['url'] = uploadedFileUrl;
+    }
     return this.prisma.resource.update({
       where: { id },
       data: updateResourceDto,
