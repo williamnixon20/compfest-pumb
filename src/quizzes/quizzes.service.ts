@@ -37,13 +37,16 @@ export class QuizzesService {
 
     try {
       const score: number = await this.calculateScore(createSubmissionDto);
-      return await this.prisma.submission.create({
+      const submission: Submission = await this.prisma.submission.create({
         data: {
           user_id: user.id,
           quiz_id: quizId,
           score,
         },
       });
+      await this.saveUserAnswer(submission.id, createSubmissionDto);
+      
+      return submission;
     } catch (err) {
       throw new BadRequestException("Failed to submit!", err.message);
     }
@@ -54,7 +57,7 @@ export class QuizzesService {
       const quizzes: Quiz[] = await this.prisma.quiz.findMany();
 
       if (user.role === UserRole.STUDENT) {
-        let quizzesAttempt: Quiz[];
+        let quizzesAttempt: Quiz[] = [];
         
         for (let quiz of quizzes) {
           const attempt: boolean = await this.checkAttempt(user.id, quiz.id);
@@ -111,18 +114,14 @@ export class QuizzesService {
             quiz_id: quizId,
           }
         },
-        select: {
-          id: true,
-          user_id: true,
-          quiz_id: true,
-          score: true,
+        include: {
           answers: {
             select: {
               question_id: true,
               option_id: true,
             }
           }
-        },
+        }
       });
   
       const userAnswers: UserAnswer[] = 
@@ -203,7 +202,7 @@ export class QuizzesService {
   }
 
   async checkAnswer(userAnswers: CreateSubmissionDto[]) {
-    let checkedAnswers: UserAnswer[];
+    let checkedAnswers: UserAnswer[] = [];
 
     for (let answer of userAnswers) {
       const { feedback, correct_id } = 
@@ -221,5 +220,17 @@ export class QuizzesService {
     }
 
     return checkedAnswers;
+  }
+
+  async saveUserAnswer(submissionId: number, userAnswers: CreateSubmissionDto[]) {
+    for (let answer of userAnswers) {
+      await this.prisma.optionOnQuestion.create({
+        data: {
+          question_id: answer.question_id,
+          option_id: answer.option_id,
+          submission_id: submissionId,
+        }
+      });
+    }
   }
 }

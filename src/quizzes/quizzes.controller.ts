@@ -14,6 +14,7 @@ import { CreateQuizDto } from './dto/create-quiz.dto';
 import { UpdateQuizDto } from './dto/update-quiz.dto';
 import {
   ApiBearerAuth,
+  ApiBody,
   ApiCreatedResponse,
   ApiOkResponse,
   ApiTags,
@@ -40,6 +41,7 @@ export class QuizzesController {
   @ApiBearerAuth()
   @Post(':id/submission')
   @ApiCreatedResponse({ type: Submission })
+  @ApiBody({ type: [CreateSubmissionDto] })
   createQuizSubmission(
     @Request() req,
     @Param('id', ParseIntPipe) id: number,
