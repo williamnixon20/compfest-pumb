@@ -26,7 +26,7 @@ export class QuestionsService {
       });
   
       const { id:question_id } = question;
-      this.prisma.answer.create({
+      await this.prisma.answer.create({
         data: {
           question_id,
         },
