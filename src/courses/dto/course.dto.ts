@@ -14,7 +14,6 @@ export class CreateCourseDto {
   @ApiProperty({ type: [category] })
   categories: string;
 
-  @IsNotEmpty()
   @ApiProperty({ type: 'string', format: 'binary' })
   file: string;
 }
