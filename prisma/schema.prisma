@@ -19,7 +19,7 @@ model User {
   role        UserRole
   subscribers StudentsOnCourses[]
   teachers    TeachersOnCourses[]
-  quizzes     UserOnQuiz[]
+  submission  Submission[]
   status      UserStatus?
 }
 
@@ -32,22 +32,49 @@ model UserStatus {
 }
 
 model Quiz {
-  id        Int          @id @default(autoincrement())
-  title     String
-  course_id Int
-  course    Course       @relation(fields: [course_id], references: [id])
-  questions Question[]
-  attempts  UserOnQuiz[]
+  id          Int         @id @default(autoincrement())
+  title       String
+  course_id   Int
+  course      Course      @relation(fields: [course_id], references: [id])
+  questions   Question[]
+  submission  Submission[]
 }
 
 model Question {
-  id               Int                @id @default(autoincrement())
-  statement        String
-  quiz_id          Int
-  quiz             Quiz               @relation(fields: [quiz_id], references: [id])
-  Answer           Answer?
-  Option           Option[]
-  OptionOnQuestion OptionOnQuestion[]
+  id          Int         @id @default(autoincrement())
+  statement   String
+  options     Option[]
+  answer      Answer?
+  attempts    OptionOnQuestion[]
+  quiz_id     Int
+  quiz        Quiz        @relation(fields: [quiz_id], references: [id])
+}
+
+model Option {
+  id          Int         @id @default(autoincrement())
+  content     String
+  answer      Answer?
+  question_id Int
+  question    Question    @relation(fields: [question_id], references: [id])
+  attempts    OptionOnQuestion[]
+}
+
+model Answer {
+  question_id Int         @id
+  question    Question    @relation(fields: [question_id], references: [id])
+  correct_id  Int?        @unique
+  option      Option?     @relation(fields: [correct_id], references: [id])
+  feedback    String?
+}
+
+model OptionOnQuestion {
+  id                Int        @id @default(autoincrement())
+  question_id       Int
+  question          Question   @relation(fields: [question_id], references: [id])
+  option_id         Int
+  option            Option     @relation(fields: [option_id], references: [id])
+  submission_id     Int
+  submission        Submission @relation(fields: [submission_id], references: [id])
 }
 
 model Course {
@@ -87,6 +114,7 @@ model Lecture {
 
 model Resource {
   id         Int          @id @default(autoincrement())
+  name       String
   type       ResourceType
   url        String
   lecture_id Int
@@ -116,42 +144,16 @@ model TeachersOnCourses {
   @@id([course_id, user_id])
 }
 
-model UserOnQuiz {
-  id               Int                @id @default(autoincrement())
+model Submission {
+  id               Int              @id @default(autoincrement())
   user_id          Int
+  user             User             @relation(fields: [user_id], references: [id])
   quiz_id          Int
+  quiz             Quiz             @relation(fields: [quiz_id], references: [id])
   score            Int
-  quiz             Quiz               @relation(fields: [quiz_id], references: [id])
-  user             User               @relation(fields: [user_id], references: [id])
-  OptionOnQuestion OptionOnQuestion[]
-}
-
-model Answer {
-  question_id Int      @unique
-  option_id   Int      @unique
-  feedback    String
-  Option      Option   @relation(fields: [option_id], references: [id])
-  Question    Question @relation(fields: [question_id], references: [id])
-
-  @@id([question_id, option_id])
-}
-
-model Option {
-  id               Int                @id @default(autoincrement())
-  content          String
-  question_id      Int
-  Question         Question           @relation(fields: [question_id], references: [id])
-  Answer           Answer?
-  OptionOnQuestion OptionOnQuestion[]
-}
-
-model OptionOnQuestion {
-  id          Int          @id @default(autoincrement())
-  question_id Int
-  option_id   Int
-  Option      Option       @relation(fields: [option_id], references: [id])
-  Question    Question     @relation(fields: [question_id], references: [id])
-  UserOnQuiz  UserOnQuiz[]
+  answers          OptionOnQuestion[]
+  
+  @@unique([user_id, quiz_id])
 }
 
 enum UserRole {

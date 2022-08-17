@@ -35,10 +35,10 @@ export class ResourcesController {
   @ApiConsumes('multipart/form-data')
   @UseInterceptors(FileInterceptor('file'))
   create(
+    @Request() req,
     @Body() createResourceDto: CreateResourceDto,
     @UploadedFile()
     file: Express.Multer.File,
-    @Request() req,
   ) {
     return this.resourcesService.create(createResourceDto, file, req.user);
   }

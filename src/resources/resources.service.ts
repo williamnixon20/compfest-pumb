@@ -1,4 +1,9 @@
-import { Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  ForbiddenException,
+  Injectable,
+} from '@nestjs/common';
+import { User, UserRole } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { AwsService } from 'src/aws/aws.service';
 
@@ -10,6 +15,12 @@ export class ResourcesService {
   ) {}
 
   async create(createResourceDto, file, user) {
+    if (user.role !== UserRole.TEACHER) {
+      throw new ForbiddenException(
+        'You are not allowed to access this resource!',
+      );
+    }
+
     const uploadedFileUrl = await this.awsService.upload(file);
     createResourceDto['url'] = uploadedFileUrl;
     const { lecture_id, ...createResourceData } = createResourceDto;
@@ -26,7 +37,11 @@ export class ResourcesService {
   }
 
   findAll() {
-    return this.prisma.resource.findMany();
+    try {
+      return this.prisma.resource.findMany();
+    } catch (err) {
+      throw new BadRequestException("Can't fetch resource!", err.message);
+    }
   }
 
   findOne(id: number) {

@@ -1,49 +1,103 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  ParseIntPipe,
+  Request,
+} from '@nestjs/common';
 import { QuizzesService } from './quizzes.service';
 import { CreateQuizDto } from './dto/create-quiz.dto';
 import { UpdateQuizDto } from './dto/update-quiz.dto';
-import { ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiBody,
+  ApiCreatedResponse,
+  ApiOkResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { Quiz } from './entities/quiz.entity';
-import { Question } from 'src/questions/entities/question.entity';
+import { CreateSubmissionDto } from './dto/create-submission.dto';
+import { Submission } from './entities/submission.entity';
 
 @Controller('quizzes')
 @ApiTags('quizzes')
 export class QuizzesController {
   constructor(private readonly quizzesService: QuizzesService) {}
 
+  @ApiBearerAuth()
   @Post()
-  @ApiCreatedResponse({ type: Quiz})
-  create(@Body() createQuizDto: CreateQuizDto) {
-    return this.quizzesService.create(createQuizDto);
+  @ApiCreatedResponse({ type: Quiz })
+  create(
+    @Request() req,
+    @Body() createQuizDto: CreateQuizDto,
+  ) {
+    return this.quizzesService.create(req.user, createQuizDto);
   }
 
+  @ApiBearerAuth()
+  @Post(':id/submission')
+  @ApiCreatedResponse({ type: Submission })
+  @ApiBody({ type: [CreateSubmissionDto] })
+  createQuizSubmission(
+    @Request() req,
+    @Param('id', ParseIntPipe) id: number,
+    @Body() createSubmissionDto: CreateSubmissionDto[],
+  ) {
+    return this.quizzesService.createSubmission(req.user, id, createSubmissionDto);
+  }
+
+  @ApiBearerAuth()
   @Get()
-  @ApiOkResponse({ type: Quiz, isArray: true })
-  findAll() {
-    return this.quizzesService.findAll();
+  @ApiOkResponse({ type: [Quiz] })
+  findAll(
+    @Request() req,
+  ) {
+    return this.quizzesService.findAll(req.user);
   }
 
+  @ApiBearerAuth()
   @Get(':id')
   @ApiOkResponse({ type: Quiz })
-  findOne(@Param('id') id: string) {
-    return this.quizzesService.findOne(+id);
+  findOne(
+    @Request() req,
+    @Param('id', ParseIntPipe) id: number,
+  ) {
+    return this.quizzesService.findOne(req.user, id);
   }
 
-  @Get(':id/questions')
-  @ApiOkResponse({ type: [Question] })
-  findQuestionsByQuizId(@Param('id') id: string) {
-    return this.quizzesService.findQuestionsByQuizId(+id);
+  @ApiBearerAuth()
+  @Get(':id/submission')
+  @ApiOkResponse({ type: Submission })
+  findQuizSubmission(
+    @Request() req,
+    @Param('id', ParseIntPipe) id: number,
+  ) {
+    return this.quizzesService.findSubmission(req.user, id);
   }
 
+  @ApiBearerAuth()
   @Patch(':id')
   @ApiOkResponse({ type: Quiz })
-  update(@Param('id') id: string, @Body() updateQuizDto: UpdateQuizDto) {
-    return this.quizzesService.update(+id, updateQuizDto);
+  update(
+    @Request() req,
+    @Param('id', ParseIntPipe) id: number,
+    @Body() updateQuizDto: UpdateQuizDto,
+  ) {
+    return this.quizzesService.update(req.user, id, updateQuizDto);
   }
+
+  @ApiBearerAuth()
 
   @Delete(':id')
   @ApiOkResponse({ type: Quiz })
-  remove(@Param('id') id: string) {
-    return this.quizzesService.remove(+id);
+  remove(
+    @Request() req,
+    @Param('id', ParseIntPipe) id: number,
+  ) {
+    return this.quizzesService.remove(req.user, id);
   }
 }

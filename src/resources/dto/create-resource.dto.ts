@@ -1,6 +1,12 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { ResourceType } from '@prisma/client';
-import { IsEnum, IsNotEmpty, IsNumber, IsString } from 'class-validator';
+import {
+  IsEnum,
+  IsNotEmpty,
+  IsNumber,
+  IsOptional,
+  IsString,
+} from 'class-validator';
 
 export class CreateResourceDto {
   @IsNotEmpty()
@@ -14,4 +20,12 @@ export class CreateResourceDto {
 
   @IsNotEmpty()
   lecture_id: number;
+
+  @IsNotEmpty()
+  @IsString()
+  name: string;
+
+  @IsOptional()
+  @IsString()
+  url: string;
 }

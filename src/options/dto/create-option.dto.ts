@@ -5,14 +5,14 @@ import {
     IsString,
 } from "class-validator";
 
-export class CreateQuestionDto {
+export class CreateOptionDto {
     @IsNotEmpty()
     @IsString()
     @ApiProperty()
-    statement: string;
+    content: string;
 
     @IsNotEmpty()
     @IsNumber()
     @ApiProperty()
-    quiz_id: number;
+    question_id: number;
 }

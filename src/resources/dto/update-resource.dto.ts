@@ -1,4 +1,25 @@
-import { PartialType } from '@nestjs/swagger';
-import { CreateResourceDto } from './create-resource.dto';
+import { ApiProperty } from "@nestjs/swagger";
+import { ResourceType } from "@prisma/client";
+import {
+    IsEnum,
+    IsNotEmpty,
+    IsString,
+} from "class-validator";
 
-export class UpdateResourceDto extends PartialType(CreateResourceDto) {}
+export class UpdateResourceDto {
+    @IsNotEmpty()
+    @IsString()
+    @ApiProperty()
+    name?: string;
+
+    @IsNotEmpty()
+    @IsString()
+    @IsEnum(ResourceType)
+    @ApiProperty({ enum: ResourceType })
+    type?: ResourceType;
+    
+    @IsNotEmpty()
+    @IsString()
+    @ApiProperty()
+    url?: string;
+}
