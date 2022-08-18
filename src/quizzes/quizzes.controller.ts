@@ -6,7 +6,6 @@ import {
   Patch,
   Param,
   Delete,
-  ParseIntPipe,
   Request,
 } from '@nestjs/common';
 import { QuizzesService } from './quizzes.service';
@@ -44,7 +43,7 @@ export class QuizzesController {
   @ApiBody({ type: [CreateSubmissionDto] })
   createQuizSubmission(
     @Request() req,
-    @Param('id', ParseIntPipe) id: number,
+    @Param('id') id: string,
     @Body() createSubmissionDto: CreateSubmissionDto[],
   ) {
     return this.quizzesService.createSubmission(req.user, id, createSubmissionDto);
@@ -62,7 +61,7 @@ export class QuizzesController {
   @ApiOkResponse({ type: Quiz })
   findOne(
     @Request() req,
-    @Param('id', ParseIntPipe) id: number,
+    @Param('id') id: string,
   ) {
     return this.quizzesService.findOne(req.user, id);
   }
@@ -72,7 +71,7 @@ export class QuizzesController {
   @ApiOkResponse({ type: Submission })
   findQuizSubmission(
     @Request() req,
-    @Param('id', ParseIntPipe) id: number,
+    @Param('id') id: string,
   ) {
     return this.quizzesService.findSubmission(req.user, id);
   }
@@ -82,7 +81,7 @@ export class QuizzesController {
   @ApiOkResponse({ type: Quiz })
   update(
     @Request() req,
-    @Param('id', ParseIntPipe) id: number,
+    @Param('id') id: string,
     @Body() updateQuizDto: UpdateQuizDto,
   ) {
     return this.quizzesService.update(req.user, id, updateQuizDto);
@@ -94,7 +93,7 @@ export class QuizzesController {
   @ApiOkResponse({ type: Quiz })
   remove(
     @Request() req,
-    @Param('id', ParseIntPipe) id: number,
+    @Param('id') id: string,
   ) {
     return this.quizzesService.remove(req.user, id);
   }

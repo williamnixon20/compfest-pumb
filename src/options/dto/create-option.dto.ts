@@ -1,7 +1,6 @@
 import { ApiProperty } from "@nestjs/swagger";
 import {
     IsNotEmpty,
-    IsNumber,
     IsString,
 } from "class-validator";
 
@@ -12,7 +11,7 @@ export class CreateOptionDto {
     content: string;
 
     @IsNotEmpty()
-    @IsNumber()
+    @IsString()
     @ApiProperty()
-    question_id: number;
+    question_id: string;
 }

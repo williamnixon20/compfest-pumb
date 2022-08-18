@@ -32,7 +32,7 @@ export class OptionsService {
     return this.prisma.option.findMany();
   }
 
-  async findOne(id: number) {
+  async findOne(id: string) {
     try {
       const option: Option = await this.prisma.option.findUniqueOrThrow({
         where: { id },
@@ -43,7 +43,7 @@ export class OptionsService {
     }
   }
 
-  async update(user: User, id: number, updateOptionDto: UpdateOptionDto) {
+  async update(user: User, id: string, updateOptionDto: UpdateOptionDto) {
     if (user.role !== UserRole.TEACHER) {
       throw new ForbiddenException("You are not allowed to access this resource!");
     }
@@ -59,7 +59,7 @@ export class OptionsService {
     }
   }
 
-  async remove(user: User, id: number) {
+  async remove(user: User, id: string) {
     if (user.role !== UserRole.TEACHER) {
       throw new ForbiddenException("You are not allowed to access this resource!");
     }

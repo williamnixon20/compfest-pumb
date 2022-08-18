@@ -49,7 +49,7 @@ export class QuestionsService {
     });
   }
 
-  async findOne(id: number) {
+  async findOne(id: string) {
     try {
       const question: Question = await this.prisma.question.findUniqueOrThrow({
         where: { id },
@@ -68,7 +68,7 @@ export class QuestionsService {
     }
   }
 
-  async findAnswer(user: User, QuestionId: number) {
+  async findAnswer(user: User, QuestionId: string) {
     if (user.role === UserRole.STUDENT) {
       throw new ForbiddenException("You are not allowed to access this resource!");
     }
@@ -83,7 +83,7 @@ export class QuestionsService {
     }
   }
 
-  async update(user: User, id: number, updateQuestionDto: UpdateQuestionDto) {
+  async update(user: User, id: string, updateQuestionDto: UpdateQuestionDto) {
     if (user.role !== UserRole.TEACHER) {
       throw new ForbiddenException("You are not allowed to access this resource!");
     }
@@ -99,7 +99,7 @@ export class QuestionsService {
     }
   }
 
-  async updateAnswer(user: User, QuestionId: number, updateAnswerDto: UpdateAnswerDto) {
+  async updateAnswer(user: User, QuestionId: string, updateAnswerDto: UpdateAnswerDto) {
     if (user.role !== UserRole.TEACHER) {
       throw new ForbiddenException("You are not allowed to access this resource!");
     }
@@ -115,7 +115,7 @@ export class QuestionsService {
     }
   }
 
-  async updateFeedback(user: User, QuestionId: number, updateFeedback: UpdateFeedbackDto) {
+  async updateFeedback(user: User, QuestionId: string, updateFeedback: UpdateFeedbackDto) {
     if (user.role !== UserRole.TEACHER) {
       throw new ForbiddenException("You are not allowed to access this resource!");
     }
@@ -131,7 +131,7 @@ export class QuestionsService {
     }
   }
 
-  async remove(user: User, id: number) {
+  async remove(user: User, id: string) {
     if (user.role !== UserRole.TEACHER) {
       throw new ForbiddenException("You are not allowed to access this resource!");
     }

@@ -3,7 +3,7 @@ import { Category } from "src/categories/entities/category.entity";
 
 export class Course {
     @ApiProperty()
-    id: number;
+    id: string;
 
     @ApiProperty()
     name: string;

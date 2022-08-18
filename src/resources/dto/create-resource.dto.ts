@@ -3,7 +3,6 @@ import { ResourceType } from '@prisma/client';
 import {
   IsEnum,
   IsNotEmpty,
-  IsNumber,
   IsOptional,
   IsString,
 } from 'class-validator';
@@ -20,7 +19,8 @@ export class CreateResourceDto {
   file?: string;
 
   @IsNotEmpty()
-  lecture_id: number;
+  @IsString()
+  lecture_id: string;
 
   @IsNotEmpty()
   @IsString()

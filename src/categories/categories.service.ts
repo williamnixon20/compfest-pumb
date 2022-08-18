@@ -6,27 +6,27 @@ import { Category } from './entities/category.entity';
 @Injectable()
 export class CategoriesService {
   create(createCategoryDto: CreateCategoryDto) {
-    const category = new Category(0, createCategoryDto.name);
+    const category = new Category();
     return category;
   }
 
   findAll() {
-    const category = new Category(0, "Technology");
+    const category = new Category();
     return [category];
   }
 
-  findOne(id: number) {
-    const category = new Category(id, "Technology");
+  findOne(id: string) {
+    const category = new Category();
     return category;
   }
 
-  update(id: number, updateCategoryDto: UpdateCategoryDto) {
-    const category = new Category(id, updateCategoryDto.name);
+  update(id: string, updateCategoryDto: UpdateCategoryDto) {
+    const category = new Category();
     return category;
   }
 
-  remove(id: number) {
-    const category = new Category(id, "Technology");
+  remove(id: string) {
+    const category = new Category();
     return category;
   }
 }

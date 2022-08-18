@@ -16,7 +16,7 @@ export class AuthService {
   ) {}
 
   private async validateUser(loginUserData: LoginUserDto): Promise<{
-    id: number;
+    id: string;
     email: string;
     username: string;
     first_name: string;

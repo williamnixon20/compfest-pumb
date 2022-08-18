@@ -121,7 +121,7 @@ export class CoursesService {
     }
   }
 
-  async findOne(id: number, user) {
+  async findOne(id: string, user) {
     try {
       const course = await this.prisma.course.findUnique({
         where: {
@@ -158,7 +158,7 @@ export class CoursesService {
     }
   }
 
-  findQuizzesByCourseId(id: number, user) {
+  findQuizzesByCourseId(id: string, user) {
     return this.prisma.quiz.findMany({
       where: {
         course: {
@@ -168,7 +168,7 @@ export class CoursesService {
     });
   }
 
-  findLecturesByCourseId(id: number, user) {
+  findLecturesByCourseId(id: string, user) {
     return this.prisma.lecture.findMany({
       where: {
         course: {
@@ -178,7 +178,7 @@ export class CoursesService {
     });
   }
 
-  async subscribe(id: number, user) {
+  async subscribe(id: string, user) {
     if (user.role !== UserRole.STUDENT)
       throw new UnauthorizedException(
         'You are not allowed to access this resource!',

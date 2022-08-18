@@ -1,12 +1,12 @@
 import { ApiProperty } from "@nestjs/swagger";
 import {
     IsNotEmpty,
-    IsNumber,
+    IsString,
 } from "class-validator";
 
 export class UpdateAnswerDto {
     @IsNotEmpty()
-    @IsNumber()
+    @IsString()
     @ApiProperty()
-    correct_id: number;
+    correct_id: string;
 }

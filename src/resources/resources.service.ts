@@ -31,7 +31,7 @@ export class ResourcesService {
         data: {
           ...createResourceData,
           lecture: {
-            connect: { id: +lecture_id },
+            connect: { id: lecture_id },
           },
         },
       });
@@ -45,7 +45,7 @@ export class ResourcesService {
     return this.prisma.resource.findMany();
   }
 
-  async findOne(id: number) {
+  async findOne(id: string) {
     try {
       const resource: Resource = await this.prisma.resource.findUniqueOrThrow({
         where: { id },
@@ -56,7 +56,7 @@ export class ResourcesService {
     }
   }
 
-  async update(user: User, id: number, updateResourceDto: UpdateResourceDto, file) {
+  async update(user: User, id: string, updateResourceDto: UpdateResourceDto, file) {
     if (user.role !== UserRole.TEACHER) {
       throw new ForbiddenException("You are not allowed to access this resource!");
     }
@@ -76,7 +76,7 @@ export class ResourcesService {
     }
   }
 
-  async remove(user: User, id: number) {
+  async remove(user: User, id: string) {
     if (user.role !== UserRole.TEACHER) {
       throw new ForbiddenException("You are not allowed to access this resource!");
     }

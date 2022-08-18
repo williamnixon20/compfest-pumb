@@ -2,11 +2,11 @@ import { ApiProperty } from "@nestjs/swagger";
 
 export class Option {
     @ApiProperty()
-    id: number;
+    id: string;
 
     @ApiProperty()
     content: string;
 
     @ApiProperty()
-    question_id?: number;
+    question_id?: string;
 }
