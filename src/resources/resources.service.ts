@@ -22,12 +22,18 @@ export class ResourcesService {
     }
 
     try {
+      const { lecture_id, ...createResourceData } = createResourceDto;
       if (file) {
         const uploadedFileUrl = await this.awsService.upload(file);
-        createResourceDto['url'] = uploadedFileUrl;
+        createResourceData['url'] = uploadedFileUrl;
       }
       const resource: Resource = await this.prisma.resource.create({
-        data: createResourceDto,
+        data: {
+          ...createResourceData,
+          lecture: {
+            connect: { id: +lecture_id },
+          },
+        },
       });
       return resource;
     } catch (err) {
