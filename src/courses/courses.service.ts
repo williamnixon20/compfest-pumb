@@ -4,27 +4,26 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { Status, User, UserRole } from '@prisma/client';
-import { Lecture } from 'src/lectures/entities/lecture.entity';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { Quiz } from 'src/quizzes/entities/quiz.entity';
 import { CreateCourseDto } from './dto/course.dto';
-import { Course } from './entities/course.entity';
-
+import { AwsService } from 'src/aws/aws.service';
 @Injectable()
 export class CoursesService {
-  constructor(private prisma: PrismaService) {}
-  async create(data: CreateCourseDto, user: User) {
-    if (user.role !== UserRole.TEACHER)
-      throw new UnauthorizedException(
-        'You are not allowed to access this resource!',
-      );
+  constructor(private prisma: PrismaService, private awsService: AwsService) {}
+  async create(data: any, file: Express.Multer.File, user: User) {
+    // if (user.role !== UserRole.TEACHER)
+    //   throw new UnauthorizedException(
+    //     'You are not allowed to access this resource!',
+    //   );
     const { categories, ...course } = data;
+    const uploadedFileUrl = await this.awsService.upload(file);
+    course['thumbnail_url'] = uploadedFileUrl;
     try {
       const courses = this.prisma.course.create({
         data: {
           ...course,
           categories: {
-            connectOrCreate: categories.map((category) => {
+            connectOrCreate: JSON.parse(categories).map((category) => {
               return {
                 where: { name: category.name },
                 create: { name: category.name },
@@ -82,7 +81,7 @@ export class CoursesService {
       };
     }
     try {
-      return await this.prisma.course.findMany({
+      const courses = await this.prisma.course.findMany({
         where: {
           ...queryCourse,
           ...queryCateg,
@@ -115,6 +114,8 @@ export class CoursesService {
           },
         },
       });
+
+      return this.isEnrolledMapper(courses, user);
     } catch (err) {
       throw new BadRequestException("Can't fetch course!", err.message);
     }
@@ -122,7 +123,7 @@ export class CoursesService {
 
   async findOne(id: number, user) {
     try {
-      return await this.prisma.course.findUnique({
+      const course = await this.prisma.course.findUnique({
         where: {
           id: id,
         },
@@ -144,8 +145,14 @@ export class CoursesService {
               followers: true,
             },
           },
+          followers: {
+            where: {
+              user_id: user.id,
+            },
+          },
         },
       });
+      return this.isEnrolledMapper([course], user)[0];
     } catch (err) {
       throw new BadRequestException("Can't fetch course!", err.message);
     }
@@ -200,39 +207,69 @@ export class CoursesService {
 
     if (user.role === UserRole.TEACHER) {
       teacherQuery = {
-        teachers: {
-          include: {
-            course: true,
+        teacher: {
+          some: {
+            user_id: user.id,
           },
         },
       };
     }
     if (user.role === UserRole.STUDENT) {
       studentQuery = {
-        subscribers: {
-          include: {
-            course: true,
+        followers: {
+          some: {
+            user_id: user.id,
           },
         },
       };
     }
     try {
-      return await this.prisma.user.findUnique({
+      const courses = await this.prisma.course.findMany({
         where: {
-          id: +user.id,
-        },
-        select: {
-          id: true,
-          username: true,
-          email: true,
-          role: true,
           ...teacherQuery,
           ...studentQuery,
         },
+        include: {
+          categories: true,
+          teacher: {
+            include: {
+              user: {
+                select: {
+                  username: true,
+                  email: true,
+                },
+              },
+            },
+          },
+          course_status: true,
+          _count: {
+            select: {
+              followers: true,
+            },
+          },
+          followers: {
+            where: {
+              user_id: user.id,
+            },
+          },
+        },
       });
+      return this.isEnrolledMapper(courses, user);
     } catch (err) {
       throw new BadRequestException("Can't fetch course!", err.message);
     }
+  }
+
+  isEnrolledMapper(courses, user) {
+    const isStudent = user.role === UserRole.STUDENT;
+    return courses.map((course) => {
+      if (isStudent && course['followers'].length === 0) {
+        course['enrolled'] = false;
+      } else {
+        course['enrolled'] = true;
+      }
+      return course;
+    });
   }
 
   // update(id: number, updateCourseDto: UpdateCourseDto) {

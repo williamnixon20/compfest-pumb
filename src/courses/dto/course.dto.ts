@@ -11,11 +11,11 @@ export class CreateCourseDto {
   description: string;
 
   @IsNotEmpty()
-  thumbnail_url: string;
-
-  @IsNotEmpty()
   @ApiProperty({ type: [category] })
-  categories: category[];
+  categories: string;
+
+  @ApiProperty({ type: 'string', format: 'binary' })
+  file: string;
 }
 
 export class ParamsDto {
