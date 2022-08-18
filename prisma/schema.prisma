@@ -35,7 +35,7 @@ model Quiz {
   id          Int         @id @default(autoincrement())
   title       String
   course_id   Int
-  course      Course      @relation(fields: [course_id], references: [id])
+  course      Course      @relation(fields: [course_id], references: [id], onDelete: Cascade)
   questions   Question[]
   submission  Submission[]
 }
@@ -47,7 +47,7 @@ model Question {
   answer      Answer?
   attempts    OptionOnQuestion[]
   quiz_id     Int
-  quiz        Quiz        @relation(fields: [quiz_id], references: [id])
+  quiz        Quiz        @relation(fields: [quiz_id], references: [id], onDelete: Cascade)
 }
 
 model Option {
@@ -55,13 +55,13 @@ model Option {
   content     String
   answer      Answer?
   question_id Int
-  question    Question    @relation(fields: [question_id], references: [id])
+  question    Question    @relation(fields: [question_id], references: [id], onDelete: Cascade)
   attempts    OptionOnQuestion[]
 }
 
 model Answer {
   question_id Int         @id
-  question    Question    @relation(fields: [question_id], references: [id])
+  question    Question    @relation(fields: [question_id], references: [id], onDelete: Cascade)
   correct_id  Int?        @unique
   option      Option?     @relation(fields: [correct_id], references: [id])
   feedback    String?
@@ -70,11 +70,11 @@ model Answer {
 model OptionOnQuestion {
   id                Int        @id @default(autoincrement())
   question_id       Int
-  question          Question   @relation(fields: [question_id], references: [id])
+  question          Question   @relation(fields: [question_id], references: [id], onDelete: Cascade)
   option_id         Int
-  option            Option     @relation(fields: [option_id], references: [id])
+  option            Option     @relation(fields: [option_id], references: [id], onDelete: Cascade)
   submission_id     Int
-  submission        Submission @relation(fields: [submission_id], references: [id])
+  submission        Submission @relation(fields: [submission_id], references: [id], onDelete: Cascade)
 }
 
 model Course {
@@ -108,7 +108,7 @@ model Lecture {
   id        Int        @id @default(autoincrement())
   course_id Int
   title     String
-  course    Course     @relation(fields: [course_id], references: [id])
+  course    Course     @relation(fields: [course_id], references: [id], onDelete: Cascade)
   resources Resource[]
 }
 
@@ -118,7 +118,7 @@ model Resource {
   type       ResourceType
   url        String
   lecture_id Int
-  lecture    Lecture      @relation(fields: [lecture_id], references: [id])
+  lecture    Lecture      @relation(fields: [lecture_id], references: [id], onDelete: Cascade)
 }
 
 model StudentsOnCourses {
@@ -147,9 +147,9 @@ model TeachersOnCourses {
 model Submission {
   id               Int              @id @default(autoincrement())
   user_id          Int
-  user             User             @relation(fields: [user_id], references: [id])
+  user             User             @relation(fields: [user_id], references: [id], onDelete: Cascade)
   quiz_id          Int
-  quiz             Quiz             @relation(fields: [quiz_id], references: [id])
+  quiz             Quiz             @relation(fields: [quiz_id], references: [id], onDelete: Cascade)
   score            Int
   answers          OptionOnQuestion[]
   
