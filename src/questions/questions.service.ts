@@ -9,18 +9,20 @@ import { CreateQuestionDto } from './dto/create-question.dto';
 import { UpdateAnswerDto } from './dto/update-answer.dto';
 import { UpdateFeedbackDto } from './dto/update-feedback.dto';
 import { UpdateQuestionDto } from './dto/update-question.dto';
+import { Answer } from './entities/answer.entity';
+import { Question } from './entities/question.entity';
 
 @Injectable()
 export class QuestionsService {
   constructor(private readonly prisma: PrismaService) {}
 
-  create(user: User, createQuestionDto: CreateQuestionDto) {
+  async create(user: User, createQuestionDto: CreateQuestionDto) {
     if (user.role !== UserRole.TEACHER) {
       throw new ForbiddenException("You are not allowed to access this resource!");
     }
 
     try {
-      return this.prisma.question.create({
+      const question: Question = await this.prisma.question.create({
         data: {
           ...createQuestionDto,
           answer: {
@@ -28,31 +30,28 @@ export class QuestionsService {
           }
         }
       });
+      return question;
     } catch (err) {
       throw new BadRequestException("Can't create question!", err.message);
     }
   }
 
   findAll() {
-    try {
-      return this.prisma.question.findMany({
-        include: {
-          options: {
-            select: {
-              id: true,
-              content: true,
-            }
-          },
+    return this.prisma.question.findMany({
+      include: {
+        options: {
+          select: {
+            id: true,
+            content: true,
+          }
         },
-      }); 
-    } catch (err) {
-      throw new BadRequestException("Can't fetch question!", err.message);
-    }
+      },
+    });
   }
 
-  findOne(id: number) {
+  async findOne(id: number) {
     try {
-      return this.prisma.question.findUniqueOrThrow({
+      const question: Question = await this.prisma.question.findUniqueOrThrow({
         where: { id },
         include: {
           options: {
@@ -62,80 +61,86 @@ export class QuestionsService {
             }
           },
         },
-      }); 
+      });
+      return question;
     } catch (err) {
       throw new BadRequestException("Can't fetch question!", err.message);
     }
   }
 
-  findAnswer(user: User, QuestionId: number) {
+  async findAnswer(user: User, QuestionId: number) {
     if (user.role === UserRole.STUDENT) {
       throw new ForbiddenException("You are not allowed to access this resource!");
     }
 
     try {
-      return this.prisma.answer.findUniqueOrThrow({
+      const answer: Answer = await this.prisma.answer.findUniqueOrThrow({
         where: { question_id: QuestionId }
-      }); 
+      });
+      return answer;
     } catch (err) {
       throw new BadRequestException("Can't fetch answer!", err.message);
     }
   }
 
-  update(user: User, id: number, updateQuestionDto: UpdateQuestionDto) {
+  async update(user: User, id: number, updateQuestionDto: UpdateQuestionDto) {
     if (user.role !== UserRole.TEACHER) {
       throw new ForbiddenException("You are not allowed to access this resource!");
     }
 
     try {
-      return this.prisma.question.update({
+      const question: Question = await this.prisma.question.update({
         where: { id },
         data: updateQuestionDto,
-      }); 
+      });
+      return question;
     } catch (err) {
       throw new BadRequestException("Failed to update question!", err.message);
     }
   }
 
-  updateAnswer(user: User, QuestionId: number, updateAnswerDto: UpdateAnswerDto) {
+  async updateAnswer(user: User, QuestionId: number, updateAnswerDto: UpdateAnswerDto) {
     if (user.role !== UserRole.TEACHER) {
       throw new ForbiddenException("You are not allowed to access this resource!");
     }
 
     try {
-      return this.prisma.answer.update({
+      const answer: Answer = await this.prisma.answer.update({
         where: { question_id: QuestionId },
         data: updateAnswerDto,
       });
+      return answer;
     } catch (err) {
       throw new BadRequestException("Failed to update answer!", err.message);
     }
   }
 
-  updateFeedback(user: User, QuestionId: number, updateFeedback: UpdateFeedbackDto) {
+  async updateFeedback(user: User, QuestionId: number, updateFeedback: UpdateFeedbackDto) {
     if (user.role !== UserRole.TEACHER) {
       throw new ForbiddenException("You are not allowed to access this resource!");
     }
 
     try {
-      return this.prisma.answer.update({
+      const answer: Answer = await this.prisma.answer.update({
         where: { question_id: QuestionId },
         data: updateFeedback,
-      }); 
+      });
+      return answer;
     } catch (err) {
       throw new BadRequestException("Failed to update feedback!", err.message);
     }
   }
 
-  remove(user: User, id: number) {
+  async remove(user: User, id: number) {
     if (user.role !== UserRole.TEACHER) {
       throw new ForbiddenException("You are not allowed to access this resource!");
     }
 
     try {
-      return this.prisma.question.delete({
+      const question: Question = await this.prisma.question.delete({
         where: { id },
-      }); 
+      });
+      return question;
     } catch (err) {
       throw new BadRequestException("Failed to delete question!", err.message);
     }

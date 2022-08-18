@@ -53,10 +53,8 @@ export class QuizzesController {
   @ApiBearerAuth()
   @Get()
   @ApiOkResponse({ type: [Quiz] })
-  findAll(
-    @Request() req,
-  ) {
-    return this.quizzesService.findAll(req.user);
+  findAll() {
+    return this.quizzesService.findAll();
   }
 
   @ApiBearerAuth()

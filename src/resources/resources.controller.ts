@@ -40,7 +40,7 @@ export class ResourcesController {
     @UploadedFile()
     file: Express.Multer.File,
   ) {
-    return this.resourcesService.create(createResourceDto, file, req.user);
+    return this.resourcesService.create(req.user, createResourceDto, file);
   }
 
   @ApiBearerAuth()
@@ -69,13 +69,16 @@ export class ResourcesController {
     @Request() req,
     @Param('id', ParseIntPipe) id: number,
   ) {
-    return this.resourcesService.update(id, createResourceDto, file, req.user);
+    return this.resourcesService.update(req.user, id, createResourceDto, file);
   }
 
   @ApiBearerAuth()
   @Delete(':id')
   @ApiOkResponse({ type: Resource })
-  remove(@Param('id', ParseIntPipe) id: number) {
-    return this.resourcesService.remove(id);
+  remove(
+    @Request() req,
+    @Param('id', ParseIntPipe) id: number,
+  ) {
+    return this.resourcesService.remove(req.user, id);
   }
 }

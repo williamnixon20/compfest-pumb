@@ -16,15 +16,16 @@ import { UserAnswer } from './entities/user-answer.entity';
 export class QuizzesService {
   constructor(private readonly prisma: PrismaService) {}
 
-  create(user: User, createQuizDto: CreateQuizDto) {
+  async create(user: User, createQuizDto: CreateQuizDto) {
     if (user.role !== UserRole.TEACHER) {
       throw new ForbiddenException("You are not allowed to access this resource!");
     }
 
     try {
-      return this.prisma.quiz.create({
+      const quiz: Quiz = await this.prisma.quiz.create({
         data: createQuizDto,
       });
+      return quiz;
     } catch (err) {
       throw new BadRequestException("Can't create quiz!", err.message);
     }
@@ -50,7 +51,7 @@ export class QuizzesService {
     try {
       const score: number = await this.calculateScore(totalQuestion, createSubmissionDto);
 
-      return await this.prisma.submission.create({
+      const submission: Submission = await this.prisma.submission.create({
         data: {
           user_id: user.id,
           quiz_id: quizId,
@@ -62,17 +63,15 @@ export class QuizzesService {
           }
         },
       });
+
+      return submission;
     } catch (err) {
       throw new BadRequestException("Failed to submit!", err.message);
     }
   }
 
-  findAll(user: User) {
-    try {
-      return this.prisma.quiz.findMany();
-    } catch (err) {
-      throw new BadRequestException("Can't fetch quiz!", err.message);
-    }
+  findAll() {
+    return this.prisma.quiz.findMany();
   }
 
   async findOne(user: User, quizId: number) {
@@ -144,30 +143,32 @@ export class QuizzesService {
     }
   }
 
-  update(user: User, id: number, updateQuizDto: UpdateQuizDto) {
+  async update(user: User, id: number, updateQuizDto: UpdateQuizDto) {
     if (user.role !== UserRole.TEACHER) {
       throw new ForbiddenException("You are not allowed to access this resource!");
     }
 
     try {
-      return this.prisma.quiz.update({
+      const quiz: Quiz = await this.prisma.quiz.update({
         where: { id },
         data: updateQuizDto,
       });
+      return quiz;
     } catch (err) {
       throw new BadRequestException("Failed to update quiz!", err.message);
     }
   }
 
-  remove(user: User, id: number) {
+  async remove(user: User, id: number) {
     if (user.role !== UserRole.TEACHER) {
       throw new ForbiddenException("You are not allowed to access this resource!");
     }
 
     try {
-      return this.prisma.quiz.delete({
+      const quiz: Quiz = await this.prisma.quiz.delete({
         where: { id },
       });
+      return quiz;
     } catch (err) {
       throw new BadRequestException("Failed to delete quiz!", err.message);
     }
