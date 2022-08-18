@@ -16,15 +16,16 @@ import { UserAnswer } from './entities/user-answer.entity';
 export class QuizzesService {
   constructor(private readonly prisma: PrismaService) {}
 
-  create(user: User, createQuizDto: CreateQuizDto) {
+  async create(user: User, createQuizDto: CreateQuizDto) {
     if (user.role !== UserRole.TEACHER) {
       throw new ForbiddenException("You are not allowed to access this resource!");
     }
 
     try {
-      return this.prisma.quiz.create({
+      const quiz: Quiz = await this.prisma.quiz.create({
         data: createQuizDto,
       });
+      return quiz;
     } catch (err) {
       throw new BadRequestException("Can't create quiz!", err.message);
     }
@@ -35,42 +36,42 @@ export class QuizzesService {
       throw new ForbiddenException("You are not allowed to access this resource!");
     }
 
+    const totalQuestion: number = 
+      await this.prisma.question.count({
+        where: {
+          quiz_id: quizId,
+        }
+      }
+    );
+
+    if (totalQuestion !== createSubmissionDto.length) {
+      throw new BadRequestException(`The total number of questions is ${totalQuestion}`);
+    }
+
     try {
-      const score: number = await this.calculateScore(createSubmissionDto);
+      const score: number = await this.calculateScore(totalQuestion, createSubmissionDto);
+
       const submission: Submission = await this.prisma.submission.create({
         data: {
           user_id: user.id,
           quiz_id: quizId,
-          score,
+          score: Math.ceil(score),
+          answers: {
+            createMany: {
+              data: createSubmissionDto,
+            }
+          }
         },
       });
-      await this.saveUserAnswer(submission.id, createSubmissionDto);
-      
+
       return submission;
     } catch (err) {
       throw new BadRequestException("Failed to submit!", err.message);
     }
   }
 
-  async findAll(user: User) {
-    try {
-      const quizzes: Quiz[] = await this.prisma.quiz.findMany();
-
-      if (user.role === UserRole.STUDENT) {
-        let quizzesAttempt: Quiz[] = [];
-        
-        for (let quiz of quizzes) {
-          const attempt: boolean = await this.checkAttempt(user.id, quiz.id);
-          const quizAttempt: Quiz = {...quiz, attempt};
-          quizzesAttempt.push(quizAttempt);
-        }
-        return quizzesAttempt;
-      }
-
-      return quizzes;
-    } catch (err) {
-      throw new BadRequestException("Can't fetch quiz!", err.message);
-    }
+  findAll() {
+    return this.prisma.quiz.findMany();
   }
 
   async findOne(user: User, quizId: number) {
@@ -81,9 +82,16 @@ export class QuizzesService {
         },
         include: {
           questions: {
-            include: {
-              options: true,
-            }
+            select: {
+              id: true,
+              statement: true,
+              options: {
+                select: {
+                  id: true,
+                  content: true,
+                }
+              }
+            },
           }
         }
       });
@@ -125,7 +133,7 @@ export class QuizzesService {
       });
   
       const userAnswers: UserAnswer[] = 
-        await this.checkAnswer(submission.answers);
+        await this.checkCorrectAnswer(submission.answers);
       const submissionWithFeedback: Submission =
         {...submission, answers: userAnswers};
   
@@ -135,37 +143,38 @@ export class QuizzesService {
     }
   }
 
-  update(user: User, id: number, updateQuizDto: UpdateQuizDto) {
+  async update(user: User, id: number, updateQuizDto: UpdateQuizDto) {
     if (user.role !== UserRole.TEACHER) {
       throw new ForbiddenException("You are not allowed to access this resource!");
     }
 
     try {
-      return this.prisma.quiz.update({
+      const quiz: Quiz = await this.prisma.quiz.update({
         where: { id },
         data: updateQuizDto,
       });
+      return quiz;
     } catch (err) {
       throw new BadRequestException("Failed to update quiz!", err.message);
     }
   }
 
-  remove(user: User, id: number) {
+  async remove(user: User, id: number) {
     if (user.role !== UserRole.TEACHER) {
       throw new ForbiddenException("You are not allowed to access this resource!");
     }
 
     try {
-      return this.prisma.quiz.delete({
+      const quiz: Quiz = await this.prisma.quiz.delete({
         where: { id },
       });
+      return quiz;
     } catch (err) {
       throw new BadRequestException("Failed to delete quiz!", err.message);
     }
   }
 
-  async calculateScore(createSubmissionDto: CreateSubmissionDto[]) {
-    const totalQuestion: number = createSubmissionDto.length;
+  async calculateScore(totalQuestion: number, createSubmissionDto: CreateSubmissionDto[]) {
     let totalCorrectAnswer: number = 0;
 
     for (let answer of createSubmissionDto) {
@@ -201,7 +210,7 @@ export class QuizzesService {
     return isAttempt;
   }
 
-  async checkAnswer(userAnswers: CreateSubmissionDto[]) {
+  async checkCorrectAnswer(userAnswers: CreateSubmissionDto[]) {
     let checkedAnswers: UserAnswer[] = [];
 
     for (let answer of userAnswers) {
@@ -220,17 +229,5 @@ export class QuizzesService {
     }
 
     return checkedAnswers;
-  }
-
-  async saveUserAnswer(submissionId: number, userAnswers: CreateSubmissionDto[]) {
-    for (let answer of userAnswers) {
-      await this.prisma.optionOnQuestion.create({
-        data: {
-          question_id: answer.question_id,
-          option_id: answer.option_id,
-          submission_id: submissionId,
-        }
-      });
-    }
   }
 }

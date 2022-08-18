@@ -7,67 +7,68 @@ import { User, UserRole } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateOptionDto } from './dto/create-option.dto';
 import { UpdateOptionDto } from './dto/update-option.dto';
+import { Option } from './entities/option.entity';
 
 @Injectable()
 export class OptionsService {
   constructor(private readonly prisma: PrismaService) {}
 
-  create(user: User, createOptionDto: CreateOptionDto) {
+  async create(user: User, createOptionDto: CreateOptionDto) {
     if (user.role !== UserRole.TEACHER) {
       throw new ForbiddenException("You are not allowed to access this resource!");
     }
 
     try {
-      return this.prisma.option.create({
+      const option: Option = await this.prisma.option.create({
         data: createOptionDto,
-      }); 
+      });
+      return option;
     } catch (err) {
       throw new BadRequestException("Can't create option!", err.message);
     }
   }
 
   findAll() {
-    try {
-      return this.prisma.option.findMany();  
-    } catch (err) {
-      throw new BadRequestException("Can't fetch option!", err.message);
-    }
+    return this.prisma.option.findMany();
   }
 
-  findOne(id: number) {
+  async findOne(id: number) {
     try {
-      return this.prisma.option.findUniqueOrThrow({
+      const option: Option = await this.prisma.option.findUniqueOrThrow({
         where: { id },
-      }); 
+      });
+      return option;
     } catch (err) {
       throw new BadRequestException("Can't fetch option!", err.message);
     }
   }
 
-  update(user: User, id: number, updateOptionDto: UpdateOptionDto) {
+  async update(user: User, id: number, updateOptionDto: UpdateOptionDto) {
     if (user.role !== UserRole.TEACHER) {
       throw new ForbiddenException("You are not allowed to access this resource!");
     }
 
     try {
-      return this.prisma.option.update({
+      const option: Option = await this.prisma.option.update({
         where: { id },
         data: updateOptionDto,
-      }); 
+      });
+      return option;
     } catch (err) {
       throw new BadRequestException("Failed to update option!", err.message);
     }
   }
 
-  remove(user: User, id: number) {
+  async remove(user: User, id: number) {
     if (user.role !== UserRole.TEACHER) {
       throw new ForbiddenException("You are not allowed to access this resource!");
     }
 
     try {
-      return this.prisma.option.delete({
+      const option: Option = await this.prisma.option.delete({
         where: { id },
-      }); 
+      });
+      return option;
     } catch (err) {
       throw new BadRequestException("Failed to delete option!", err.message);
     }
