@@ -2,10 +2,10 @@ import { ApiProperty } from "@nestjs/swagger";
 
 export class Answer {
     @ApiProperty()
-    question_id: number;
+    question_id: string;
 
     @ApiProperty()
-    correct_id: number;
+    correct_id: string;
 
     @ApiProperty()
     feedback: string;

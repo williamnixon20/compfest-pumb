@@ -1,11 +1,11 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Status } from '@prisma/client';
-import { IsEnum, IsNotEmpty, IsNumberString } from 'class-validator';
+import { IsEnum, IsNotEmpty, IsString } from 'class-validator';
 
 export class UpdateStatusObject {
   @IsNotEmpty()
-  @IsNumberString()
-  id: number;
+  @IsString()
+  id: string;
 
   @IsNotEmpty()
   @ApiProperty({ enum: ['VERIFYING', 'VERIFIED', 'REJECTED'] })

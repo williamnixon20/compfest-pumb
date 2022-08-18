@@ -3,13 +3,13 @@ import { Option } from "src/options/entities/option.entity";
 
 export class Question {
     @ApiProperty()
-    id: number;
+    id: string;
 
     @ApiProperty()
     statement: string;
 
     @ApiProperty()
-    quiz_id?: number;
+    quiz_id?: string;
 
     @ApiProperty({ type: [Option] })
     options?: Option[];

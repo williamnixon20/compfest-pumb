@@ -3,7 +3,7 @@ import { ResourceType } from "@prisma/client";
 
 export class Resource {
     @ApiProperty()
-    id: number;
+    id: string;
 
     @ApiProperty()
     name: string;
@@ -15,5 +15,5 @@ export class Resource {
     url: string;
     
     @ApiProperty()
-    lecture_id: number;
+    lecture_id: string;
 }

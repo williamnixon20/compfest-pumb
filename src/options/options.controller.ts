@@ -6,7 +6,6 @@ import {
   Patch,
   Param,
   Delete,
-  ParseIntPipe,
   Request,
 } from '@nestjs/common';
 import { OptionsService } from './options.service';
@@ -46,7 +45,7 @@ export class OptionsController {
   @Get(':id')
   @ApiOkResponse({ type: Option })
   findOne(
-    @Param('id', ParseIntPipe) id: number,
+    @Param('id') id: string,
   ) {
     return this.optionsService.findOne(id);
   }
@@ -56,7 +55,7 @@ export class OptionsController {
   @ApiOkResponse({ type: Option })
   update(
     @Request() req,
-    @Param('id', ParseIntPipe) id: number,
+    @Param('id') id: string,
     @Body() updateOptionDto: UpdateOptionDto,
   ) {
     return this.optionsService.update(req.user, id, updateOptionDto);
@@ -67,7 +66,7 @@ export class OptionsController {
   @ApiOkResponse({ type: Option })
   remove(
     @Request() req,
-    @Param('id', ParseIntPipe) id: number,
+    @Param('id') id: string,
   ) {
     return this.optionsService.remove(req.user, id);
   }

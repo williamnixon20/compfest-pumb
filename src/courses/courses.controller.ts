@@ -69,14 +69,14 @@ export class CoursesController {
   @Post(':id/subscribe')
   @ApiBearerAuth()
   subscribe(@Request() req, @Param() params: idParamsDto) {
-    return this.coursesService.subscribe(+params.id, req.user);
+    return this.coursesService.subscribe(params.id, req.user);
   }
 
   @Get(':id')
   @ApiOkResponse({ type: Course })
   @ApiBearerAuth()
   findOne(@Param() params: idParamsDto, @Request() req) {
-    return this.coursesService.findOne(+params.id, req.user);
+    return this.coursesService.findOne(params.id, req.user);
   }
 
   @Get(':id/quizzes')
@@ -84,14 +84,14 @@ export class CoursesController {
   @ApiBearerAuth()
   @Public()
   findQuizzesByCourseId(@Param() params: idParamsDto, @Request() req) {
-    return this.coursesService.findQuizzesByCourseId(+params.id, req.user);
+    return this.coursesService.findQuizzesByCourseId(params.id, req.user);
   }
 
   @Get(':id/lectures')
   @ApiOkResponse({ type: [Lecture] })
   @ApiBearerAuth()
   findLecturesByCourseId(@Param() params: idParamsDto, @Request() req) {
-    return this.coursesService.findLecturesByCourseId(+params.id, req.user);
+    return this.coursesService.findLecturesByCourseId(params.id, req.user);
   }
 
   // @Patch(':id')

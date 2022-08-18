@@ -7,7 +7,6 @@ import {
   Patch,
   Param,
   Delete,
-  ParseIntPipe,
   UploadedFile,
   UseInterceptors,
 } from '@nestjs/common';
@@ -53,7 +52,7 @@ export class ResourcesController {
   @ApiBearerAuth()
   @Get(':id')
   @ApiOkResponse({ type: Resource })
-  findOne(@Param('id', ParseIntPipe) id: number) {
+  findOne(@Param('id') id: string) {
     return this.resourcesService.findOne(id);
   }
 
@@ -67,7 +66,7 @@ export class ResourcesController {
     @UploadedFile()
     file: Express.Multer.File,
     @Request() req,
-    @Param('id', ParseIntPipe) id: number,
+    @Param('id') id: string,
   ) {
     return this.resourcesService.update(req.user, id, createResourceDto, file);
   }
@@ -77,7 +76,7 @@ export class ResourcesController {
   @ApiOkResponse({ type: Resource })
   remove(
     @Request() req,
-    @Param('id', ParseIntPipe) id: number,
+    @Param('id') id: string,
   ) {
     return this.resourcesService.remove(req.user, id);
   }

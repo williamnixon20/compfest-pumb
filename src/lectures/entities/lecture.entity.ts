@@ -2,11 +2,11 @@ import { ApiProperty } from "@nestjs/swagger";
 
 export class Lecture {
     @ApiProperty()
-    id: number;
+    id: string;
 
     @ApiProperty()
     title: string;
 
     @ApiProperty()
-    course_id: number;
+    course_id: string;
 }

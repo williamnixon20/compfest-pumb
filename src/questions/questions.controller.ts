@@ -6,7 +6,6 @@ import {
   Patch,
   Param,
   Delete,
-  ParseIntPipe,
   Request,
 } from '@nestjs/common';
 import { QuestionsService } from './questions.service';
@@ -49,7 +48,7 @@ export class QuestionsController {
   @Get(':id')
   @ApiOkResponse({ type: Question })
   findOne(
-    @Param('id', ParseIntPipe) id: number,
+    @Param('id') id: string,
   ) {
     return this.questionsService.findOne(id);
   }
@@ -59,7 +58,7 @@ export class QuestionsController {
   @ApiOkResponse({ type: Answer })
   findAnswer(
     @Request() req,
-    @Param('id', ParseIntPipe) id: number,
+    @Param('id') id: string,
   ) {
     return this.questionsService.findAnswer(req.user, id);
   }
@@ -69,7 +68,7 @@ export class QuestionsController {
   @ApiOkResponse({ type: Question })
   update(
     @Request() req,
-    @Param('id', ParseIntPipe) id: number,
+    @Param('id') id: string,
     @Body() updateQuestionDto: UpdateQuestionDto,
   ) {
     return this.questionsService.update(req.user, id, updateQuestionDto);
@@ -80,7 +79,7 @@ export class QuestionsController {
   @ApiOkResponse()
   updateCorrectAnswer(
     @Request() req,
-    @Param('id', ParseIntPipe) id: number,
+    @Param('id') id: string,
     @Body() updateAnswerDto: UpdateAnswerDto,
   ) {
     return this.questionsService.updateAnswer(req.user, id, updateAnswerDto);
@@ -91,7 +90,7 @@ export class QuestionsController {
   @ApiOkResponse()
   updateFeedback(
     @Request() req,
-    @Param('id', ParseIntPipe) id: number,
+    @Param('id') id: string,
     @Body() updateFeedbackDto: UpdateFeedbackDto,
   ) {
     return this.questionsService.updateFeedback(req.user, id, updateFeedbackDto);
@@ -102,7 +101,7 @@ export class QuestionsController {
   @ApiOkResponse({ type: Question })
   remove(
     @Request() req,
-    @Param('id', ParseIntPipe) id: number,
+    @Param('id') id: string,
   ) {
     return this.questionsService.remove(req.user, id);
   }

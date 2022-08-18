@@ -3,13 +3,13 @@ import { Question } from "src/questions/entities/question.entity";
 
 export class Quiz {
     @ApiProperty()
-    id: number;
+    id: string;
 
     @ApiProperty()
     title: string;
 
     @ApiProperty()
-    course_id: number;
+    course_id: string;
 
     @ApiProperty()
     attempt?: boolean;

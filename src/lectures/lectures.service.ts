@@ -32,7 +32,7 @@ export class LecturesService {
     return this.prisma.lecture.findMany();
   }
 
-  async findOne(id: number) {
+  async findOne(id: string) {
     try {
       const lecture: Lecture = await this.prisma.lecture.findUniqueOrThrow({
         where: { id },
@@ -43,7 +43,7 @@ export class LecturesService {
     }
   }
 
-  async findResourcesByLectureId(lectureId: number) {
+  async findResourcesByLectureId(lectureId: string) {
     try {
       const resources: Resource[] = await this.prisma.resource.findMany({
         where: { lecture_id: lectureId },
@@ -54,7 +54,7 @@ export class LecturesService {
     }
   }
 
-  async update(user: User, id: number, updateLectureDto: UpdateLectureDto) {
+  async update(user: User, id: string, updateLectureDto: UpdateLectureDto) {
     if (user.role !== UserRole.TEACHER) {
       throw new ForbiddenException("You are not allowed to access this resource!");
     }
@@ -70,7 +70,7 @@ export class LecturesService {
     }
   }
 
-  async remove(user: User, id: number) {
+  async remove(user: User, id: string) {
     if (user.role !== UserRole.TEACHER) {
       throw new ForbiddenException("You are not allowed to access this resource!");
     }

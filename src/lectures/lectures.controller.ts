@@ -6,7 +6,6 @@ import {
   Patch,
   Param,
   Delete,
-  ParseIntPipe,
   Request,
 } from '@nestjs/common';
 import { LecturesService } from './lectures.service';
@@ -47,7 +46,7 @@ export class LecturesController {
   @Get(':id')
   @ApiOkResponse({ type: Lecture })
   findOne(
-    @Param('id', ParseIntPipe) id: number,
+    @Param('id') id: string,
   ) {
     return this.lecturesService.findOne(id);
   }
@@ -56,18 +55,17 @@ export class LecturesController {
   @Get(':id/resources')
   @ApiOkResponse({ type: Resource, isArray: true })
   findResourcesByLectureId(
-    @Param('id', ParseIntPipe) id: number,
+    @Param('id') id: string,
   ) {
     return this.lecturesService.findResourcesByLectureId(id);
   }
-
 
   @ApiBearerAuth()
   @Patch(':id')
   @ApiOkResponse({ type: Lecture })
   update(
     @Request() req,
-    @Param('id', ParseIntPipe) id: number,
+    @Param('id') id: string,
     @Body() updateLectureDto: UpdateLectureDto,
   ) {
     return this.lecturesService.update(req.user, id, updateLectureDto);
@@ -78,7 +76,7 @@ export class LecturesController {
   @ApiOkResponse({ type: Lecture })
   remove(
     @Request() req,
-    @Param('id', ParseIntPipe) id: number,
+    @Param('id') id: string,
   ) {
     return this.lecturesService.remove(req.user, id);
   }

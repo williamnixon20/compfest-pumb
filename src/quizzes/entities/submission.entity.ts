@@ -3,13 +3,13 @@ import { UserAnswer } from "./user-answer.entity";
 
 export class Submission {
     @ApiProperty()
-    id: number;
+    id: string;
 
     @ApiProperty()
-    user_id: number;
+    user_id: string;
 
     @ApiProperty()
-    quiz_id: number;
+    quiz_id: string;
 
     @ApiProperty()
     score: number;

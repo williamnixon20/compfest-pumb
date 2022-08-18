@@ -91,7 +91,7 @@ export class AdminService {
         data.map((data) => {
           return this.prisma.course.update({
             where: {
-              id: +data.id,
+              id: data.id,
             },
             data: {
               course_status: {
@@ -123,7 +123,7 @@ export class AdminService {
         data.map((data) => {
           return this.prisma.user.update({
             where: {
-              id: +data.id,
+              id: data.id,
             },
             data: {
               status: {

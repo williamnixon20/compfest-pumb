@@ -31,7 +31,7 @@ export class QuizzesService {
     }
   }
 
-  async createSubmission(user: User, quizId: number, createSubmissionDto: CreateSubmissionDto[]) {
+  async createSubmission(user: User, quizId: string, createSubmissionDto: CreateSubmissionDto[]) {
     if (user.role !== UserRole.STUDENT) {
       throw new ForbiddenException("You are not allowed to access this resource!");
     }
@@ -74,7 +74,7 @@ export class QuizzesService {
     return this.prisma.quiz.findMany();
   }
 
-  async findOne(user: User, quizId: number) {
+  async findOne(user: User, quizId: string) {
     try {
       const quiz: Quiz = await this.prisma.quiz.findUniqueOrThrow({
         where: {
@@ -109,7 +109,7 @@ export class QuizzesService {
     }
   }
 
-  async findSubmission(user: User, quizId: number) {
+  async findSubmission(user: User, quizId: string) {
     if (user.role !== UserRole.STUDENT) {
       throw new ForbiddenException("You are not allowed to access this resource!");
     }
@@ -143,7 +143,7 @@ export class QuizzesService {
     }
   }
 
-  async update(user: User, id: number, updateQuizDto: UpdateQuizDto) {
+  async update(user: User, id: string, updateQuizDto: UpdateQuizDto) {
     if (user.role !== UserRole.TEACHER) {
       throw new ForbiddenException("You are not allowed to access this resource!");
     }
@@ -159,7 +159,7 @@ export class QuizzesService {
     }
   }
 
-  async remove(user: User, id: number) {
+  async remove(user: User, id: string) {
     if (user.role !== UserRole.TEACHER) {
       throw new ForbiddenException("You are not allowed to access this resource!");
     }
@@ -198,7 +198,7 @@ export class QuizzesService {
     return score;
   }
 
-  async checkAttempt(userId: number, quizId: number) {
+  async checkAttempt(userId: string, quizId: string) {
     const totalAttempt: number = await this.prisma.submission.count({
       where: { 
         user_id: userId,
