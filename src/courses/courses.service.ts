@@ -3,18 +3,20 @@ import {
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
-import { Status, User, UserRole } from '@prisma/client';
+import { Status, UserRole } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { AwsService } from 'src/aws/aws.service';
 @Injectable()
 export class CoursesService {
   constructor(private prisma: PrismaService, private awsService: AwsService) {}
-  async create(data, file: Express.Multer.File, user: User) {
-    if (user.role !== UserRole.TEACHER)
+  async create(data, file: Express.Multer.File, user) {
+    if (
+      user.role !== UserRole.TEACHER ||
+      user.status.status !== Status.VERIFIED
+    )
       throw new UnauthorizedException(
         'You are not allowed to access this resource!',
       );
-
     const { categories, ...course } = data;
 
     try {
@@ -57,7 +59,6 @@ export class CoursesService {
       });
       return courses;
     } catch (err) {
-      console.log(err);
       throw new BadRequestException("Can't create course!" + err.message);
     }
   }
@@ -217,6 +218,7 @@ export class CoursesService {
         'You are not allowed to access this resource!',
       );
     try {
+      await this.findOne(id, user);
       const course = await this.prisma.course.update({
         where: {
           id: id,
@@ -307,7 +309,7 @@ export class CoursesService {
 
   validateAccess(course, user) {
     if (user.role === UserRole.TEACHER) {
-      if (course['teacher']['user']['id'] !== user.id) return false;
+      if (course['teacher'][0]['user']['id'] !== user.id) return false;
     } else if (user.role === UserRole.STUDENT) {
       if (course['course_status']['status'] !== Status.VERIFIED) return false;
     }
