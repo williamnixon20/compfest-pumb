@@ -21,7 +21,6 @@ import {
   ApiOkResponse,
   ApiTags,
 } from '@nestjs/swagger';
-import { Public } from 'src/auth/jwt-auth';
 import { Lecture } from 'src/lectures/entities/lecture.entity';
 import { Quiz } from 'src/quizzes/entities/quiz.entity';
 import { CoursesService } from './courses.service';
@@ -80,7 +79,6 @@ export class CoursesController {
   @Get(':id/quizzes')
   @ApiOkResponse({ type: [Quiz] })
   @ApiBearerAuth()
-  @Public()
   findQuizzesByCourseId(@Param() params: idParamsDto, @Request() req) {
     return this.coursesService.findQuizzesByCourseId(params.id, req.user);
   }
