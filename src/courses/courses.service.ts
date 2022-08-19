@@ -3,22 +3,26 @@ import {
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
-import { Status, User, UserRole } from '@prisma/client';
+import { Status, UserRole } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { CreateCourseDto } from './dto/course.dto';
 import { AwsService } from 'src/aws/aws.service';
 @Injectable()
 export class CoursesService {
   constructor(private prisma: PrismaService, private awsService: AwsService) {}
-  async create(data: any, file: Express.Multer.File, user: User) {
-    // if (user.role !== UserRole.TEACHER)
-    //   throw new UnauthorizedException(
-    //     'You are not allowed to access this resource!',
-    //   );
+  async create(data, file: Express.Multer.File, user) {
+    if (
+      user.role !== UserRole.TEACHER ||
+      user.status.status !== Status.VERIFIED
+    )
+      throw new UnauthorizedException(
+        'You are not allowed to access this resource!',
+      );
     const { categories, ...course } = data;
-    const uploadedFileUrl = await this.awsService.upload(file);
-    course['thumbnail_url'] = uploadedFileUrl;
+
     try {
+      const uploadedFileUrl = await this.awsService.upload(file);
+      course['thumbnail_url'] = uploadedFileUrl;
+
       const courses = this.prisma.course.create({
         data: {
           ...course,
@@ -55,12 +59,11 @@ export class CoursesService {
       });
       return courses;
     } catch (err) {
-      console.log(err);
       throw new BadRequestException("Can't create course!" + err.message);
     }
   }
 
-  async findAll(courseName, categId, user) {
+  async findAllVerified(courseName, categId, user) {
     let queryCourse = {};
     let queryCateg = {};
     if (courseName) {
@@ -75,7 +78,7 @@ export class CoursesService {
       queryCateg = {
         categories: {
           some: {
-            id: +categId,
+            id: categId,
           },
         },
       };
@@ -133,6 +136,7 @@ export class CoursesService {
             include: {
               user: {
                 select: {
+                  id: true,
                   username: true,
                   email: true,
                 },
@@ -152,6 +156,12 @@ export class CoursesService {
           },
         },
       });
+
+      if (!this.validateAccess(course, user))
+        throw new UnauthorizedException(
+          'You are not allowed to access this resource!',
+        );
+
       return this.isEnrolledMapper([course], user)[0];
     } catch (err) {
       throw new BadRequestException("Can't fetch course!", err.message);
@@ -159,37 +169,47 @@ export class CoursesService {
   }
 
   findQuizzesByCourseId(id: string, user) {
-    return this.prisma.quiz.findMany({
-      where: {
-        course: {
-          id: id,
+    try {
+      this.findOne(id, user);
+      return this.prisma.quiz.findMany({
+        where: {
+          course: {
+            id: id,
+          },
         },
-      },
-      select: {
-        id: true,
-        title: true,
-      },
-      orderBy: {
-        created_at: "asc",
-      },
-    });
+        select: {
+          id: true,
+          title: true,
+        },
+        orderBy: {
+          created_at: 'asc',
+        },
+      });
+    } catch (err) {
+      throw new BadRequestException("Can't fetch course!", err.message);
+    }
   }
 
   findLecturesByCourseId(id: string, user) {
-    return this.prisma.lecture.findMany({
-      where: {
-        course: {
-          id: id,
+    try {
+      this.findOne(id, user);
+      return this.prisma.lecture.findMany({
+        where: {
+          course: {
+            id: id,
+          },
         },
-      },
-      select: {
-        id: true,
-        title: true,
-      },
-      orderBy: {
-        created_at: "asc",
-      },
-    });
+        select: {
+          id: true,
+          title: true,
+        },
+        orderBy: {
+          created_at: 'asc',
+        },
+      });
+    } catch (err) {
+      throw new BadRequestException("Can't fetch course!", err.message);
+    }
   }
 
   async subscribe(id: string, user) {
@@ -198,6 +218,7 @@ export class CoursesService {
         'You are not allowed to access this resource!',
       );
     try {
+      await this.findOne(id, user);
       const course = await this.prisma.course.update({
         where: {
           id: id,
@@ -286,16 +307,6 @@ export class CoursesService {
     });
   }
 
-  // update(id: number, updateCourseDto: UpdateCourseDto) {
-  //   const course = new Course();
-  //   return course;
-  // }
-
-  // remove(id: number) {
-  //   const course = new Course();
-  //   return course;
-  // }
-
   async checkCourseCreator(userId: string, courseId: string) {
     const teachersOnCourses = await this.prisma.teachersOnCourses.findUnique({
       where: {
@@ -307,5 +318,14 @@ export class CoursesService {
     });
 
     return teachersOnCourses !== null;
+  }
+
+  validateAccess(course, user) {
+    if (user.role === UserRole.TEACHER) {
+      if (course['teacher'][0]['user']['id'] !== user.id) return false;
+    } else if (user.role === UserRole.STUDENT) {
+      if (course['course_status']['status'] !== Status.VERIFIED) return false;
+    }
+    return true;
   }
 }
