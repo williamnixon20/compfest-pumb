@@ -165,6 +165,13 @@ export class CoursesService {
           id: id,
         },
       },
+      select: {
+        id: true,
+        title: true,
+      },
+      orderBy: {
+        created_at: "asc",
+      },
     });
   }
 
@@ -174,6 +181,13 @@ export class CoursesService {
         course: {
           id: id,
         },
+      },
+      select: {
+        id: true,
+        title: true,
+      },
+      orderBy: {
+        created_at: "asc",
       },
     });
   }

@@ -28,7 +28,12 @@ export class QuestionsService {
           answer: {
             create: {}
           }
-        }
+        },
+        select: {
+          id: true,
+          statement: true,
+          quiz_id: true,
+        },
       });
       return question;
     } catch (err) {
@@ -38,7 +43,10 @@ export class QuestionsService {
 
   findAll() {
     return this.prisma.question.findMany({
-      include: {
+      select: {
+        id: true,
+        statement: true,
+        quiz_id: true,
         options: {
           select: {
             id: true,
@@ -53,7 +61,10 @@ export class QuestionsService {
     try {
       const question: Question = await this.prisma.question.findUniqueOrThrow({
         where: { id },
-        include: {
+        select: {
+          id: true,
+          statement: true,
+          quiz_id: true,
           options: {
             select: {
               id: true,
@@ -92,6 +103,11 @@ export class QuestionsService {
       const question: Question = await this.prisma.question.update({
         where: { id },
         data: updateQuestionDto,
+        select: {
+          id: true,
+          statement: true,
+          quiz_id: true,
+        },
       });
       return question;
     } catch (err) {
@@ -139,6 +155,11 @@ export class QuestionsService {
     try {
       const question: Question = await this.prisma.question.delete({
         where: { id },
+        select: {
+          id: true,
+          statement: true,
+          quiz_id: true,
+        },
       });
       return question;
     } catch (err) {

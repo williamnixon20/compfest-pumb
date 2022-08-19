@@ -34,6 +34,13 @@ export class ResourcesService {
             connect: { id: lecture_id },
           },
         },
+        select: {
+          id: true,
+          name: true,
+          type: true,
+          url: true,
+          lecture_id: true,
+        },
       });
       return resource;
     } catch (err) {
@@ -42,13 +49,28 @@ export class ResourcesService {
   }
 
   findAll() {
-    return this.prisma.resource.findMany();
+    return this.prisma.resource.findMany({
+      select: {
+        id: true,
+        name: true,
+        type: true,
+        url: true,
+        lecture_id: true,
+      },
+    });
   }
 
   async findOne(id: string) {
     try {
       const resource: Resource = await this.prisma.resource.findUniqueOrThrow({
         where: { id },
+        select: {
+          id: true,
+          name: true,
+          type: true,
+          url: true,
+          lecture_id: true,
+        },
       });
       return resource;
     } catch (err) {
@@ -69,6 +91,13 @@ export class ResourcesService {
       const resource: Resource = await this.prisma.resource.update({
         where: { id },
         data: updateResourceDto,
+        select: {
+          id: true,
+          name: true,
+          type: true,
+          url: true,
+          lecture_id: true,
+        },
       });
       return resource;
     } catch (err) {
@@ -84,6 +113,13 @@ export class ResourcesService {
     try {
       const resource: Resource = await this.prisma.resource.delete({
         where: { id },
+        select: {
+          id: true,
+          name: true,
+          type: true,
+          url: true,
+          lecture_id: true,
+        },
       });
       return resource;
     } catch (err) {

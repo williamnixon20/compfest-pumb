@@ -3,8 +3,9 @@ import {
   ForbiddenException,
   Injectable,
 } from '@nestjs/common';
-import { Resource, User, UserRole } from '@prisma/client';
+import { User, UserRole } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { Resource } from 'src/resources/entities/resource.entity';
 import { CreateLectureDto } from './dto/create-lecture.dto';
 import { UpdateLectureDto } from './dto/update-lecture.dto';
 import { Lecture } from './entities/lecture.entity';
@@ -21,6 +22,11 @@ export class LecturesService {
     try {
       const lecture: Lecture = await this.prisma.lecture.create({
         data: createLectureDto,
+        select: {
+          id: true,
+          title: true,
+          course_id: true,
+        },
       });
       return lecture;
     } catch (err) {
@@ -29,13 +35,24 @@ export class LecturesService {
   }
 
   findAll() {
-    return this.prisma.lecture.findMany();
+    return this.prisma.lecture.findMany({
+      select: {
+        id: true,
+        title: true,
+        course_id: true,
+      },
+    });
   }
 
   async findOne(id: string) {
     try {
       const lecture: Lecture = await this.prisma.lecture.findUniqueOrThrow({
         where: { id },
+        select: {
+          id: true,
+          title: true,
+          course_id: true,
+        },
       });
       return lecture;
     } catch (err) {
@@ -47,6 +64,16 @@ export class LecturesService {
     try {
       const resources: Resource[] = await this.prisma.resource.findMany({
         where: { lecture_id: lectureId },
+        select: {
+          id: true,
+          name: true,
+          type: true,
+          url: true,
+          lecture_id: true,
+        },
+        orderBy: {
+          created_at: "asc",
+        }
       });
       return resources;
     } catch (err) {
@@ -63,6 +90,11 @@ export class LecturesService {
       const lecture: Lecture = await this.prisma.lecture.update({
         where: { id },
         data: updateLectureDto,
+        select: {
+          id: true,
+          title: true,
+          course_id: true,
+        },
       });
       return lecture;
     } catch (err) {
@@ -78,6 +110,11 @@ export class LecturesService {
     try {
       const lecture: Lecture = await this.prisma.lecture.delete({
         where: { id },
+        select: {
+          id: true,
+          title: true,
+          course_id: true,
+        },
       });
       return lecture;
     } catch (err) {
