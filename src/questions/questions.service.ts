@@ -4,6 +4,7 @@ import {
   Injectable,
 } from '@nestjs/common';
 import { User, UserRole } from '@prisma/client';
+import { QuizzesService } from 'src/quizzes/quizzes.service';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateQuestionDto } from './dto/create-question.dto';
 import { UpdateAnswerDto } from './dto/update-answer.dto';
@@ -14,10 +15,15 @@ import { Question } from './entities/question.entity';
 
 @Injectable()
 export class QuestionsService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly quizService: QuizzesService,
+  ) {}
 
   async create(user: User, createQuestionDto: CreateQuestionDto) {
-    if (user.role !== UserRole.TEACHER) {
+    if (user.role !== UserRole.TEACHER
+      || !await this.quizService.checkQuizCreator(user.id, createQuestionDto.quiz_id)
+    ) {
       throw new ForbiddenException("You are not allowed to access this resource!");
     }
 
@@ -39,22 +45,6 @@ export class QuestionsService {
     } catch (err) {
       throw new BadRequestException("Can't create question!", err.message);
     }
-  }
-
-  findAll() {
-    return this.prisma.question.findMany({
-      select: {
-        id: true,
-        statement: true,
-        quiz_id: true,
-        options: {
-          select: {
-            id: true,
-            content: true,
-          }
-        },
-      },
-    });
   }
 
   async findOne(id: string) {
@@ -95,7 +85,9 @@ export class QuestionsService {
   }
 
   async update(user: User, id: string, updateQuestionDto: UpdateQuestionDto) {
-    if (user.role !== UserRole.TEACHER) {
+    if (user.role !== UserRole.TEACHER
+      || !await this.checkQuestionCreator(user.id, id)
+    ) {
       throw new ForbiddenException("You are not allowed to access this resource!");
     }
 
@@ -116,7 +108,9 @@ export class QuestionsService {
   }
 
   async updateAnswer(user: User, QuestionId: string, updateAnswerDto: UpdateAnswerDto) {
-    if (user.role !== UserRole.TEACHER) {
+    if (user.role !== UserRole.TEACHER
+      || !await this.checkQuestionCreator(user.id, QuestionId)
+    ) {
       throw new ForbiddenException("You are not allowed to access this resource!");
     }
 
@@ -132,7 +126,9 @@ export class QuestionsService {
   }
 
   async updateFeedback(user: User, QuestionId: string, updateFeedback: UpdateFeedbackDto) {
-    if (user.role !== UserRole.TEACHER) {
+    if (user.role !== UserRole.TEACHER
+      || !await this.checkQuestionCreator(user.id, QuestionId)
+    ) {
       throw new ForbiddenException("You are not allowed to access this resource!");
     }
 
@@ -148,7 +144,9 @@ export class QuestionsService {
   }
 
   async remove(user: User, id: string) {
-    if (user.role !== UserRole.TEACHER) {
+    if (user.role !== UserRole.TEACHER
+      || !await this.checkQuestionCreator(user.id, id)
+    ) {
       throw new ForbiddenException("You are not allowed to access this resource!");
     }
 
@@ -165,5 +163,18 @@ export class QuestionsService {
     } catch (err) {
       throw new BadRequestException("Failed to delete question!", err.message);
     }
+  }
+
+  async checkQuestionCreator(userId: string, questionId: string) {
+    const { quiz_id: quizId } = await this.prisma.question.findUnique({
+      where: {
+        id: questionId,
+      },
+      select: {
+        quiz_id: true,
+      },
+    });
+    
+    return this.quizService.checkQuizCreator(userId, quizId);
   }
 }

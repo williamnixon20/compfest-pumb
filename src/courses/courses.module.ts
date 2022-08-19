@@ -8,5 +8,6 @@ import { AwsModule } from 'src/aws/aws.module';
   controllers: [CoursesController],
   providers: [CoursesService],
   imports: [PrismaModule, AwsModule],
+  exports: [CoursesService],
 })
 export class CoursesModule {}

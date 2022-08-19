@@ -4,6 +4,7 @@ import {
   Injectable,
 } from '@nestjs/common';
 import { User, UserRole } from '@prisma/client';
+import { CoursesService } from 'src/courses/courses.service';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { Resource } from 'src/resources/entities/resource.entity';
 import { CreateLectureDto } from './dto/create-lecture.dto';
@@ -12,10 +13,15 @@ import { Lecture } from './entities/lecture.entity';
 
 @Injectable()
 export class LecturesService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly courseService: CoursesService,
+  ) {}
 
   async create(user: User, createLectureDto: CreateLectureDto) {
-    if (user.role !== UserRole.TEACHER) {
+    if (user.role !== UserRole.TEACHER 
+      || !await this.courseService.checkCourseCreator(user.id, createLectureDto.course_id)
+    ) {
       throw new ForbiddenException("You are not allowed to access this resource!");
     }
 
@@ -32,16 +38,6 @@ export class LecturesService {
     } catch (err) {
       throw new BadRequestException("Can't create lecture!", err.message);
     }
-  }
-
-  findAll() {
-    return this.prisma.lecture.findMany({
-      select: {
-        id: true,
-        title: true,
-        course_id: true,
-      },
-    });
   }
 
   async findOne(id: string) {
@@ -82,7 +78,9 @@ export class LecturesService {
   }
 
   async update(user: User, id: string, updateLectureDto: UpdateLectureDto) {
-    if (user.role !== UserRole.TEACHER) {
+    if (user.role !== UserRole.TEACHER
+      || !await this.checkLectureCreator(user.id, id)
+    ) {
       throw new ForbiddenException("You are not allowed to access this resource!");
     }
 
@@ -103,7 +101,9 @@ export class LecturesService {
   }
 
   async remove(user: User, id: string) {
-    if (user.role !== UserRole.TEACHER) {
+    if (user.role !== UserRole.TEACHER
+      || !await this.checkLectureCreator(user.id, id)
+    ) {
       throw new ForbiddenException("You are not allowed to access this resource!");
     }
 
@@ -120,5 +120,18 @@ export class LecturesService {
     } catch (err) {
       throw new BadRequestException("Failed to delete lecture!", err.message);
     }
+  }
+
+  async checkLectureCreator(userId: string, lectureId: string) {
+    const { course_id: courseId } = await this.prisma.lecture.findUnique({
+      where: {
+        id: lectureId,
+      },
+      select: {
+        course_id: true,
+      },
+    });
+    
+    return this.courseService.checkCourseCreator(userId, courseId);
   }
 }
