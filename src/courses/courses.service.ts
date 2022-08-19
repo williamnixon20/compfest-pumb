@@ -295,4 +295,17 @@ export class CoursesService {
   //   const course = new Course();
   //   return course;
   // }
+
+  async checkCourseCreator(userId: string, courseId: string) {
+    const teachersOnCourses = await this.prisma.teachersOnCourses.findUnique({
+      where: {
+        course_id_user_id: {
+          user_id: userId,
+          course_id: courseId,
+        },
+      },
+    });
+
+    return teachersOnCourses !== null;
+  }
 }

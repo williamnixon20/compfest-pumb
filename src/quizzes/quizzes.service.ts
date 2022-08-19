@@ -4,6 +4,7 @@ import {
   Injectable,
 } from '@nestjs/common';
 import { User, UserRole } from '@prisma/client';
+import { CoursesService } from 'src/courses/courses.service';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateQuizDto } from './dto/create-quiz.dto';
 import { CreateSubmissionDto } from './dto/create-submission.dto';
@@ -14,10 +15,15 @@ import { UserAnswer } from './entities/user-answer.entity';
 
 @Injectable()
 export class QuizzesService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly courseService: CoursesService,
+  ) {}
 
   async create(user: User, createQuizDto: CreateQuizDto) {
-    if (user.role !== UserRole.TEACHER) {
+    if (user.role !== UserRole.TEACHER
+      || !await this.courseService.checkCourseCreator(user.id, createQuizDto.course_id)
+    ) {
       throw new ForbiddenException("You are not allowed to access this resource!");
     }
 
@@ -161,7 +167,9 @@ export class QuizzesService {
   }
 
   async update(user: User, id: string, updateQuizDto: UpdateQuizDto) {
-    if (user.role !== UserRole.TEACHER) {
+    if (user.role !== UserRole.TEACHER
+      || !await this.checkQuizCreator(user.id, id)
+    ) {
       throw new ForbiddenException("You are not allowed to access this resource!");
     }
 
@@ -182,7 +190,9 @@ export class QuizzesService {
   }
 
   async remove(user: User, id: string) {
-    if (user.role !== UserRole.TEACHER) {
+    if (user.role !== UserRole.TEACHER
+      || !await this.checkQuizCreator(user.id, id)  
+    ) {
       throw new ForbiddenException("You are not allowed to access this resource!");
     }
 
@@ -256,5 +266,18 @@ export class QuizzesService {
     }
 
     return checkedAnswers;
+  }
+
+  async checkQuizCreator(userId: string, quizId: string) {
+    const { course_id: courseId } = await this.prisma.quiz.findUnique({
+      where: {
+        id: quizId,
+      },
+      select: {
+        course_id: true,
+      },
+    });
+    
+    return this.courseService.checkCourseCreator(userId, courseId);
   }
 }

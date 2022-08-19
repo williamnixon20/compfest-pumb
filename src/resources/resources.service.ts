@@ -8,16 +8,20 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { AwsService } from 'src/aws/aws.service';
 import { UpdateResourceDto } from './dto/update-resource.dto';
 import { Resource } from './entities/resource.entity';
+import { LecturesService } from 'src/lectures/lectures.service';
 
 @Injectable()
 export class ResourcesService {
   constructor(
     private readonly prisma: PrismaService,
     private awsService: AwsService,
+    private readonly lectureService: LecturesService
   ) {}
 
   async create(user: User, createResourceDto, file) {
-    if (user.role !== UserRole.TEACHER) {
+    if (user.role !== UserRole.TEACHER
+      || !await this.lectureService.checkLectureCreator(user.id, createResourceDto.lecture_id)
+    ) {
       throw new ForbiddenException("You are not allowed to access this resource!");
     }
 
@@ -67,7 +71,9 @@ export class ResourcesService {
   }
 
   async update(user: User, id: string, updateResourceDto: UpdateResourceDto, file) {
-    if (user.role !== UserRole.TEACHER) {
+    if (user.role !== UserRole.TEACHER
+      || !await this.checkResourceCreator(user.id, id)
+    ) {
       throw new ForbiddenException("You are not allowed to access this resource!");
     }
 
@@ -94,7 +100,9 @@ export class ResourcesService {
   }
 
   async remove(user: User, id: string) {
-    if (user.role !== UserRole.TEACHER) {
+    if (user.role !== UserRole.TEACHER
+      || !await this.checkResourceCreator(user.id, id)
+    ) {
       throw new ForbiddenException("You are not allowed to access this resource!");
     }
 
@@ -113,5 +121,18 @@ export class ResourcesService {
     } catch (err) {
       throw new BadRequestException("Failed to delete resource!", err.message);
     }
+  }
+
+  async checkResourceCreator(userId: string, resourceId: string) {
+    const { lecture_id: lectureId } = await this.prisma.resource.findUnique({
+      where: {
+        id: resourceId,
+      },
+      select: {
+        lecture_id: true,
+      },
+    });
+    
+    return this.lectureService.checkLectureCreator(userId, lectureId);
   }
 }
