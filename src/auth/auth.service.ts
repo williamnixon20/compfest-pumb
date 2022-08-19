@@ -6,8 +6,8 @@ import {
 import { UsersService } from 'src/users/users.service';
 import { JwtService } from '@nestjs/jwt';
 import { CreateUserDto, LoginUserDto } from './dto/auth.dto';
-import { UserRole } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
+import { UserRole } from '@prisma/client';
 @Injectable()
 export class AuthService {
   constructor(
@@ -15,17 +15,7 @@ export class AuthService {
     private jwtService: JwtService,
   ) {}
 
-  private async validateUser(loginUserData: LoginUserDto): Promise<{
-    id: string;
-    email: string;
-    username: string;
-    first_name: string;
-    last_name: string;
-    created_at: Date;
-    updated_at: Date;
-    role: UserRole;
-    status?: string;
-  }> {
+  private async validateUser(loginUserData: LoginUserDto) {
     try {
       const user = await this.usersService.findUser({
         username: loginUserData.username,
@@ -52,7 +42,7 @@ export class AuthService {
         email: validate.email,
         username: validate.username,
         role: validate.role,
-        status: validate?.status,
+        status: validate.status,
       };
       return {
         message: 'Success!',
@@ -67,8 +57,8 @@ export class AuthService {
   }
 
   async signup(createUserDto: CreateUserDto) {
-    // if (createUserDto.role === UserRole.ADMIN)
-    //   throw new UnauthorizedException('Cant create admin!');
+    if (createUserDto.role === UserRole.ADMIN)
+      throw new UnauthorizedException('Cant create admin!');
     try {
       const { password, ...result } = await this.usersService.createUser(
         createUserDto,

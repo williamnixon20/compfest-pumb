@@ -16,11 +16,9 @@ import { Express } from 'express';
 import { FileInterceptor } from '@nestjs/platform-express';
 import {
   ApiBearerAuth,
-  ApiBody,
   ApiConsumes,
   ApiCreatedResponse,
   ApiOkResponse,
-  ApiQuery,
   ApiTags,
 } from '@nestjs/swagger';
 import { Public } from 'src/auth/jwt-auth';
@@ -53,7 +51,7 @@ export class CoursesController {
   @ApiBearerAuth()
   @ApiOkResponse({ type: Course, isArray: true })
   findAll(@Query() params: ParamsDto, @Request() req) {
-    return this.coursesService.findAll(
+    return this.coursesService.findAllVerified(
       params.courseName,
       params.categoryId,
       req.user,
@@ -93,16 +91,4 @@ export class CoursesController {
   findLecturesByCourseId(@Param() params: idParamsDto, @Request() req) {
     return this.coursesService.findLecturesByCourseId(params.id, req.user);
   }
-
-  // @Patch(':id')
-  // @ApiOkResponse({ type: Course })
-  // update(@Param('id') id: string, @Body() updateCourseDto: UpdateCourseDto) {
-  //   return this.coursesService.update(+id, updateCourseDto);
-  // }
-
-  // @Delete(':id')
-  // @ApiOkResponse({ type: Course })
-  // remove(@Param('id') id: string) {
-  //   return this.coursesService.remove(+id);
-  // }
 }

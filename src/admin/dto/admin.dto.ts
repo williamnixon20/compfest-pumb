@@ -13,6 +13,7 @@ export class UpdateStatusObject {
   status: Status;
 
   @IsNotEmpty()
+  @IsString()
   description: string;
 }
 export class UpdateStatusDto {
