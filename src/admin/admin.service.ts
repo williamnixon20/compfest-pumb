@@ -3,16 +3,9 @@ import {
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
-import {
-  Course,
-  CourseStatus,
-  Status,
-  User,
-  UserRole,
-  UserStatus,
-} from '@prisma/client';
+import { Course, Status, User, UserRole } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { UpdateStatusDto, UpdateStatusObject } from './dto/admin.dto';
+import { UpdateStatusObject } from './dto/admin.dto';
 @Injectable()
 export class AdminService {
   constructor(private prisma: PrismaService) {}
