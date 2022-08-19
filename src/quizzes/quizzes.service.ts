@@ -24,6 +24,11 @@ export class QuizzesService {
     try {
       const quiz: Quiz = await this.prisma.quiz.create({
         data: createQuizDto,
+        select: {
+          id: true,
+          title: true,
+          course_id: true,
+        }
       });
       return quiz;
     } catch (err) {
@@ -62,6 +67,12 @@ export class QuizzesService {
             }
           }
         },
+        select: {
+          id: true,
+          user_id: true,
+          quiz_id: true,
+          score: true,
+        }
       });
 
       return submission;
@@ -71,7 +82,13 @@ export class QuizzesService {
   }
 
   findAll() {
-    return this.prisma.quiz.findMany();
+    return this.prisma.quiz.findMany({
+      select: {
+        id: true,
+        title: true,
+        course_id: true,
+      },
+    });
   }
 
   async findOne(user: User, quizId: string) {
@@ -80,7 +97,10 @@ export class QuizzesService {
         where: {
           id: quizId,
         },
-        include: {
+        select: {
+          id: true,
+          title: true,
+          course_id: true,
           questions: {
             select: {
               id: true,
@@ -92,8 +112,11 @@ export class QuizzesService {
                 }
               }
             },
-          }
-        }
+            orderBy: {
+              created_at: "asc",
+            },
+          },
+        },
       });
   
       if (user.role === UserRole.STUDENT) {
@@ -122,7 +145,11 @@ export class QuizzesService {
             quiz_id: quizId,
           }
         },
-        include: {
+        select: {
+          id: true,
+          user_id: true,
+          quiz_id: true,
+          score: true,
           answers: {
             select: {
               question_id: true,
@@ -152,6 +179,11 @@ export class QuizzesService {
       const quiz: Quiz = await this.prisma.quiz.update({
         where: { id },
         data: updateQuizDto,
+        select: {
+          id: true,
+          title: true,
+          course_id: true,
+        }
       });
       return quiz;
     } catch (err) {
@@ -167,6 +199,11 @@ export class QuizzesService {
     try {
       const quiz: Quiz = await this.prisma.quiz.delete({
         where: { id },
+        select: {
+          id: true,
+          title: true,
+          course_id: true,
+        }
       });
       return quiz;
     } catch (err) {
