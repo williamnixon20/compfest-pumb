@@ -43,13 +43,6 @@ export class ResourcesController {
   }
 
   @ApiBearerAuth()
-  @Get()
-  @ApiOkResponse({ type: Resource, isArray: true })
-  findAll() {
-    return this.resourcesService.findAll();
-  }
-
-  @ApiBearerAuth()
   @Get(':id')
   @ApiOkResponse({ type: Resource })
   findOne(@Param('id') id: string) {

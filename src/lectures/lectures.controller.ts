@@ -36,13 +36,6 @@ export class LecturesController {
   }
 
   @ApiBearerAuth()
-  @Get()
-  @ApiOkResponse({ type: Lecture, isArray: true })
-  findAll() {
-    return this.lecturesService.findAll();
-  }
-
-  @ApiBearerAuth()
   @Get(':id')
   @ApiOkResponse({ type: Lecture })
   findOne(

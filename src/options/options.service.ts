@@ -28,10 +28,6 @@ export class OptionsService {
     }
   }
 
-  findAll() {
-    return this.prisma.option.findMany();
-  }
-
   async findOne(id: string) {
     try {
       const option: Option = await this.prisma.option.findUniqueOrThrow({

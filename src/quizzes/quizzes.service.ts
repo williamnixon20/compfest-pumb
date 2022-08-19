@@ -81,16 +81,6 @@ export class QuizzesService {
     }
   }
 
-  findAll() {
-    return this.prisma.quiz.findMany({
-      select: {
-        id: true,
-        title: true,
-        course_id: true,
-      },
-    });
-  }
-
   async findOne(user: User, quizId: string) {
     try {
       const quiz: Quiz = await this.prisma.quiz.findUniqueOrThrow({

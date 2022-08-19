@@ -34,16 +34,6 @@ export class LecturesService {
     }
   }
 
-  findAll() {
-    return this.prisma.lecture.findMany({
-      select: {
-        id: true,
-        title: true,
-        course_id: true,
-      },
-    });
-  }
-
   async findOne(id: string) {
     try {
       const lecture: Lecture = await this.prisma.lecture.findUniqueOrThrow({

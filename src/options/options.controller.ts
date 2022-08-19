@@ -35,13 +35,6 @@ export class OptionsController {
   }
 
   @ApiBearerAuth()
-  @Get()
-  @ApiOkResponse({ type: Option, isArray: true })
-  findAll() {
-    return this.optionsService.findAll();
-  }
-
-  @ApiBearerAuth()
   @Get(':id')
   @ApiOkResponse({ type: Option })
   findOne(

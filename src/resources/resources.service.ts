@@ -48,18 +48,6 @@ export class ResourcesService {
     }
   }
 
-  findAll() {
-    return this.prisma.resource.findMany({
-      select: {
-        id: true,
-        name: true,
-        type: true,
-        url: true,
-        lecture_id: true,
-      },
-    });
-  }
-
   async findOne(id: string) {
     try {
       const resource: Resource = await this.prisma.resource.findUniqueOrThrow({

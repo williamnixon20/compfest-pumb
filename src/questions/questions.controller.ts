@@ -38,13 +38,6 @@ export class QuestionsController {
   }
 
   @ApiBearerAuth()
-  @Get()
-  @ApiOkResponse({ type: Question, isArray: true })
-  findAll() {
-    return this.questionsService.findAll();
-  }
-
-  @ApiBearerAuth()
   @Get(':id')
   @ApiOkResponse({ type: Question })
   findOne(
