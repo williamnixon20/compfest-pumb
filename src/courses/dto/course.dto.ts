@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import { IsNotEmpty, IsOptional, IsUUID } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 class category {
   name: string;
@@ -27,6 +27,6 @@ export class ParamsDto {
 
 export class idParamsDto {
   @IsNotEmpty()
-  @IsString()
+  @IsUUID()
   id: string;
 }

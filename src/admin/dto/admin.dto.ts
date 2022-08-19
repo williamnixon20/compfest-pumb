@@ -1,10 +1,10 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Status } from '@prisma/client';
-import { IsEnum, IsNotEmpty, IsString } from 'class-validator';
+import { IsEnum, IsNotEmpty, IsUUID } from 'class-validator';
 
 export class UpdateStatusObject {
   @IsNotEmpty()
-  @IsString()
+  @IsUUID()
   id: string;
 
   @IsNotEmpty()

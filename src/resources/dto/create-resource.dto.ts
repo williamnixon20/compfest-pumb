@@ -5,6 +5,7 @@ import {
   IsNotEmpty,
   IsOptional,
   IsString,
+  IsUUID,
 } from 'class-validator';
 
 export class CreateResourceDto {
@@ -19,7 +20,7 @@ export class CreateResourceDto {
   file?: string;
 
   @IsNotEmpty()
-  @IsString()
+  @IsUUID()
   lecture_id: string;
 
   @IsNotEmpty()
