@@ -23,7 +23,7 @@ export class CoursesService {
       const uploadedFileUrl = await this.awsService.upload(file);
       course['thumbnail_url'] = uploadedFileUrl;
 
-      const courses = this.prisma.course.create({
+      const courses = await this.prisma.course.create({
         data: {
           ...course,
           categories: {
@@ -168,10 +168,10 @@ export class CoursesService {
     }
   }
 
-  findQuizzesByCourseId(id: string, user) {
+  async findQuizzesByCourseId(id: string, user) {
     try {
-      this.findOne(id, user);
-      return this.prisma.quiz.findMany({
+      await this.findOne(id, user);
+      return await this.prisma.quiz.findMany({
         where: {
           course: {
             id: id,
@@ -190,9 +190,9 @@ export class CoursesService {
     }
   }
 
-  findLecturesByCourseId(id: string, user) {
+  async findLecturesByCourseId(id: string, user) {
     try {
-      this.findOne(id, user);
+      await this.findOne(id, user);
       return this.prisma.lecture.findMany({
         where: {
           course: {

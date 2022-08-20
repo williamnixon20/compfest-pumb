@@ -17,7 +17,6 @@ export class AwsService {
   }
 
   async uploadS3(file, bucket, name) {
-    console.log(file, bucket, name);
     const s3 = this.getS3();
     const params = {
       Bucket: bucket,
